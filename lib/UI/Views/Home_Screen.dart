@@ -45,10 +45,32 @@ class _HomeScreenState extends State<HomeScreen> {
                   Map(data),
                 ],
               ),
+              floatingActionButton: FloatingActionButton.extended(
+                  onPressed: () {
+                    Navigator.of(context)
+                        .push(_createRoute());
+                  },
+                  label: Text("Create Route")),
             );
           } else {
             return Center(child: CircularProgressIndicator());
           }
+        });
+  }
+
+  Route _createRoute() {
+    return PageRouteBuilder(
+        pageBuilder: (context, animation, secondaryAnimation) => RouteScreen(),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          var begin = Offset(0.0, 1.0);
+          var end = Offset.zero;
+          var curve = Curves.easeOutCubic;
+
+          var tween =
+              Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+          return SlideTransition(
+              position: animation.drive(tween), child: child);
         });
   }
 
