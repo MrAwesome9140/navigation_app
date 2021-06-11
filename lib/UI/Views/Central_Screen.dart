@@ -38,28 +38,28 @@ class _CentralScreenState extends State<CentralScreen> {
   List<PersistentBottomNavBarItem> _navBarsItems() {
     return [
       PersistentBottomNavBarItem(
-          textStyle: TextStyle(fontSize: 15.0),
-          iconSize: 32.0,
-          icon: Icon(Icons.home),
-          title: 'Home',
-          activeColorPrimary: Colors.white,
-          inactiveColorPrimary: Colors.grey,
+        textStyle: TextStyle(fontSize: 15.0),
+        iconSize: 32.0,
+        icon: Icon(Icons.home),
+        title: 'Home',
+        activeColorPrimary: Colors.white,
+        inactiveColorPrimary: Colors.grey,
       ),
       PersistentBottomNavBarItem(
-          textStyle: TextStyle(fontSize: 15.0),
-          iconSize: 32.0,
-          icon: Icon(Icons.location_pin),
-          title: 'Create Route',
-          activeColorPrimary: Colors.white,
-          inactiveColorPrimary: Colors.grey,
+        textStyle: TextStyle(fontSize: 15.0),
+        iconSize: 32.0,
+        icon: Icon(Icons.location_pin),
+        title: 'Create Route',
+        activeColorPrimary: Colors.white,
+        inactiveColorPrimary: Colors.grey,
       ),
       PersistentBottomNavBarItem(
-          textStyle: TextStyle(fontSize: 15.0),
-          iconSize: 32.0,
-          icon: Icon(Icons.settings),
-          title: 'Settings',
-          activeColorPrimary: Colors.white,
-          inactiveColorPrimary: Colors.grey,
+        textStyle: TextStyle(fontSize: 15.0),
+        iconSize: 32.0,
+        icon: Icon(Icons.settings),
+        title: 'Settings',
+        activeColorPrimary: Colors.white,
+        inactiveColorPrimary: Colors.grey,
       ),
     ];
   }
@@ -83,7 +83,12 @@ class _CentralScreenState extends State<CentralScreen> {
     var size = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(
-        title: Text("Navigation App"),
+        title: Text(
+          "Navigation App",
+          style: TextStyle(
+            fontWeight: FontWeight.w800,
+          ),
+        ),
       ),
       // body: _buildScreens()[_curIndex],
       // bottomNavigationBar: BottomNavigationBar(
@@ -133,12 +138,13 @@ class _CentralScreenState extends State<CentralScreen> {
           );
           return false;
         },
-        selectedTabScreenContext: (context) {
-
-        },
+        selectedTabScreenContext: (context) {},
         hideNavigationBar: _hideNavBar,
         decoration: NavBarDecoration(
-          gradient: LinearGradient(colors: [Color(0xffee0290), Color(0xfff186c0)], begin: Alignment.topCenter, end: Alignment.bottomCenter),
+          gradient: LinearGradient(
+              colors: [Color(0xffee0290), Color(0xfff186c0)],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter),
           borderRadius: BorderRadius.circular(20.0),
         ),
         popAllScreensOnTapOfSelectedTab: true,
@@ -147,10 +153,9 @@ class _CentralScreenState extends State<CentralScreen> {
           curve: Curves.ease,
         ),
         screenTransitionAnimation: ScreenTransitionAnimation(
-          animateTabTransition: true,
-          curve: Curves.ease,
-          duration: Duration(milliseconds: 200)
-        ),
+            animateTabTransition: true,
+            curve: Curves.ease,
+            duration: Duration(milliseconds: 200)),
         navBarStyle: NavBarStyle.style9,
       ),
     );
