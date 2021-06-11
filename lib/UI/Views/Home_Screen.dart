@@ -45,17 +45,25 @@ class _HomeScreenState extends State<HomeScreen> {
                   Map(data),
                 ],
               ),
-              floatingActionButton: FloatingActionButton.extended(
-                  onPressed: () {
-                    Navigator.of(context)
-                        .push(_createRoute());
-                  },
-                  label: Text("Create Route")),
+              // floatingActionButtonLocation:
+              //     FloatingActionButtonLocation.centerDocked,
+              // floatingActionButton: FloatingActionButton.extended(
+              //     shape: RoundedRectangleBorder(
+              //         borderRadius: BorderRadius.all(Radius.circular(30.0))),
+              //     onPressed: () {
+              //       Navigator.of(context).push(_createRoute());
+              //     },
+              //     label: Text(
+              //       "Create Route",
+              //       style: TextStyle(fontSize: 20.0),
+              //     ),
+              // ),
             );
           } else {
             return Center(child: CircularProgressIndicator());
           }
-        });
+        },
+    );
   }
 
   Route _createRoute() {
