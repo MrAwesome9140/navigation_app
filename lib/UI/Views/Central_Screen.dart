@@ -82,14 +82,14 @@ class _CentralScreenState extends State<CentralScreen> {
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          "Navigation App",
-          style: TextStyle(
-            fontWeight: FontWeight.w800,
-          ),
-        ),
-      ),
+      // appBar: AppBar(
+      //   title: Text(
+      //     "Navigation App",
+      //     style: TextStyle(
+      //       fontWeight: FontWeight.w800,
+      //     ),
+      //   ),
+      // ),
       // body: _buildScreens()[_curIndex],
       // bottomNavigationBar: BottomNavigationBar(
       //   type: BottomNavigationBarType.shifting,
