@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 import 'package:navigation_app/UI/Views/Search_Screen.dart';
+import 'package:navigation_app/State/route_store.dart';
 
 class RouteScreen extends StatefulWidget {
   @override
@@ -8,6 +9,8 @@ class RouteScreen extends StatefulWidget {
 }
 
 class _RouteScreenState extends State<RouteScreen> {
+  RouteStore _routeStore = RouteStore();
+
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
@@ -16,10 +19,17 @@ class _RouteScreenState extends State<RouteScreen> {
         children: [
           Column(
             children: [
-              Padding(
-                padding: ,
-                child: Container(
-                  
+              Container(
+                child: ReorderableListView(
+                  children: List<Widget>.generate(_routeStore.route.length, (index) {
+                    return ListTile(
+                      leading: Icon(Icons.location_pin),
+                      title: Text(''),
+                    );
+                  }),
+                  onReorder: (before, after) {
+
+                  },
                 ),
               )
             ],
@@ -27,8 +37,8 @@ class _RouteScreenState extends State<RouteScreen> {
           Align(
             alignment: Alignment.topCenter,
             child: Padding(
-              padding: EdgeInsets.fromLTRB(
-                  size.width * 0.05, size.height * 0.03, size.width * 0.05, 0.0),
+              padding: EdgeInsets.fromLTRB(size.width * 0.05,
+                  size.height * 0.03, size.width * 0.05, 0.0),
               child: FloatingSearchBar(
                 hint: 'Add Locations...',
                 scrollPadding: EdgeInsets.only(top: 16, bottom: 56),
@@ -39,10 +49,8 @@ class _RouteScreenState extends State<RouteScreen> {
                 height: size.height * 0.06,
                 width: size.width * 0.85,
                 debounceDelay: const Duration(milliseconds: 500),
-                onQueryChanged: (query) {
-
-                },
-                onFocusChanged: (focus) {                
+                onQueryChanged: (query) {},
+                onFocusChanged: (focus) {
                   Navigator.of(context).push(MaterialPageRoute(
                     builder: (_) => SearchScreen(),
                   ));

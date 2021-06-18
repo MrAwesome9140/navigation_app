@@ -145,7 +145,7 @@ class _CentralScreenState extends State<CentralScreen> {
               colors: [Color(0xffee0290), Color(0xfff186c0)],
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter),
-          borderRadius: BorderRadius.circular(20.0),
+          //borderRadius: BorderRadius.circular(20.0),
         ),
         popAllScreensOnTapOfSelectedTab: true,
         itemAnimationProperties: ItemAnimationProperties(

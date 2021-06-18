@@ -37,31 +37,34 @@ class _SearchScreenState extends State<SearchScreen> {
               width: size.width * 0.85,
               debounceDelay: const Duration(milliseconds: 500),
               onQueryChanged: (query) {},
-              onFocusChanged: (focus) {
-              },
+              onFocusChanged: (focus) {},
               actions: [
                 FloatingSearchBarAction.back(
                   color: Colors.black,
                 )
               ],
               builder: (context, transition) {
-                return ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: Material(
-                    color: Colors.white,
-                    elevation: 4.0,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: Colors.accents.map((color) {
-                        return Container(height: 112, color: color);
-                      }).toList(),
-                    ),
-                  ),
-                );
+                return _autoCompleteOptions();
               },
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _autoCompleteOptions() {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(8),
+      child: Material(
+        color: Colors.white,
+        elevation: 4.0,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: Colors.accents.map((color) {
+            return Container(height: 112, color: color);
+          }).toList(),
+        ),
       ),
     );
   }
