@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
+import 'package:navigation_app/Services/mapbox_service.dart';
+import 'package:skeleton_text/skeleton_text.dart';
 
 class SearchScreen extends StatefulWidget {
   @override
@@ -8,12 +10,12 @@ class SearchScreen extends StatefulWidget {
 
 class _SearchScreenState extends State<SearchScreen> {
   FloatingSearchBarController _controller = FloatingSearchBarController();
+  MapBoxService _mapService = MapBoxService();
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    WidgetsBinding.instance?.addPostFrameCallback((_) => _controller.open());
   }
 
   @override
@@ -54,18 +56,56 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   Widget _autoCompleteOptions() {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(8),
-      child: Material(
-        color: Colors.white,
-        elevation: 4.0,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: Colors.accents.map((color) {
-            return Container(height: 112, color: color);
-          }).toList(),
-        ),
-      ),
+    return FutureBuilder(
+      builder: (context, snapshot) {
+        var size = MediaQuery.of(context).size;
+        if (snapshot.hasData) {
+          return ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: Material(
+              color: Colors.white,
+              elevation: 4.0,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: Colors.accents.map((color) {
+                  return Container(height: 112, color: color);
+                }).toList(),
+              ),
+            ),
+          );
+        } else {
+          return ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: Material(
+              color: Colors.white,
+              elevation: 4.0,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: List<Widget>.generate(
+                  5,
+                  (index) {
+                    return Column(
+                      children: [
+                        SkeletonAnimation(
+                          child: Container(
+                            height: size.height * 0.1,
+                            width: size.width * 0.9,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10.0),
+                              color: Colors.grey,
+                            ),
+                          ),
+                        ),
+                        Divider()
+                      ],
+                    );
+                  },
+                ),
+              ),
+            ),
+          );
+        }
+      },
     );
   }
 }
