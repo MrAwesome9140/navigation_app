@@ -4,7 +4,6 @@ import 'dart:math' as math;
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
-import 'package:color/color.dart';
 import '../Models/graph.dart';
 import 'graph_operations.dart';
 
@@ -130,13 +129,13 @@ class MapBoxService {
     return response.body;
   }
 
-  String getStaticMapImage(
-      Position center, double width, double height, int zoomLevel) {
-    String temp =
-        "https://$_baseUrl/styles/v1/mapbox/streets-v11/static/pin-l+${RgbColor.name("blue").toHexColor().toString()}(${center.longitude},${center.latitude})/${center.longitude},${center.latitude},$zoomLevel/${width.toInt()}x${height.toInt()}@2x?access_token=$_mapBoxKey&logo=false";
-    //testStuff(temp);
-    return temp;
-  }
+  // String getStaticMapImage(
+  //     Position center, double width, double height, int zoomLevel) {
+  //   String temp =
+  //       "https://$_baseUrl/styles/v1/mapbox/streets-v11/static/pin-l+${RgbColor.name("blue").toHexColor().toString()}(${center.longitude},${center.latitude})/${center.longitude},${center.latitude},$zoomLevel/${width.toInt()}x${height.toInt()}@2x?access_token=$_mapBoxKey&logo=false";
+  //   //testStuff(temp);
+  //   return temp;
+  // }
 
 //   String htmlColorNotation(sea. color) =>
 //       color.r.toInt().toRadixString(16) +

@@ -22,36 +22,96 @@ class _SearchScreenState extends State<SearchScreen> {
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
     return Scaffold(
+      backgroundColor: Colors.grey[400],
       body: Stack(
         children: [
-          Padding(
-            padding: EdgeInsets.fromLTRB(
-                size.width * 0.05, size.height * 0.03, size.width * 0.05, 0.0),
-            child: FloatingSearchBar(
-              controller: _controller,
-              hint: 'Add Locations...',
-              scrollPadding: EdgeInsets.only(top: 16, bottom: 56),
-              transitionDuration: const Duration(milliseconds: 800),
-              transitionCurve: Curves.easeInOut,
-              transition: ExpandingFloatingSearchBarTransition(),
-              physics: const BouncingScrollPhysics(),
-              height: size.height * 0.06,
-              width: size.width * 0.85,
-              debounceDelay: const Duration(milliseconds: 500),
-              onQueryChanged: (query) {},
-              onFocusChanged: (focus) {},
-              actions: [
-                FloatingSearchBarAction.back(
-                  color: Colors.black,
-                )
-              ],
-              builder: (context, transition) {
-                return _autoCompleteOptions();
-              },
+          Container(
+            child: Hero(
+              tag: 'SearchBar',
+              child: Padding(
+                padding: EdgeInsets.only(top: size.height * 0.03),
+                // child: searchBarUI()
+                child: FloatingSearchBar(
+                  elevation: 4.0,
+                  openAxisAlignment: 0.0,
+                  controller: _controller,
+                  hint: 'Add Locations...',
+                  scrollPadding: EdgeInsets.only(top: 16, bottom: 20),
+                  transitionDuration: const Duration(milliseconds: 800),
+                  transitionCurve: Curves.easeInOut,
+                  transition: CircularFloatingSearchBarTransition(),
+                  physics: BouncingScrollPhysics(),
+                  height: size.height * 0.06,
+                  width: size.width * 0.85,
+                  debounceDelay: const Duration(milliseconds: 500),
+                  onQueryChanged: (query) {},
+                  onFocusChanged: (focus) {},
+                  actions: [
+                    // FloatingSearchBarAction.back(
+                    //   color: Colors.black,
+                    // )
+                  ],
+                  builder: (context, transition) {
+                    return _autoCompleteOptions();
+                  },
+                ),
+              ),
             ),
           ),
         ],
       ),
+    );
+  }
+
+  Widget searchBarUI() {
+    return FloatingSearchBar(
+      hint: 'Search.....',
+      openAxisAlignment: 0.0,
+      axisAlignment: 0.0,
+      scrollPadding: EdgeInsets.only(top: 16, bottom: 20),
+      elevation: 4.0,
+      physics: BouncingScrollPhysics(),
+      onQueryChanged: (query) {
+        //Your methods will be here
+      },
+      transitionCurve: Curves.easeInOut,
+      transitionDuration: Duration(milliseconds: 500),
+      transition: CircularFloatingSearchBarTransition(),
+      debounceDelay: Duration(milliseconds: 500),
+      actions: [
+        FloatingSearchBarAction(
+          showIfOpened: false,
+          child: CircularButton(
+            icon: Icon(Icons.place),
+            onPressed: () {
+              print('Places Pressed');
+            },
+          ),
+        ),
+        FloatingSearchBarAction.searchToClear(
+          showIfClosed: false,
+        ),
+      ],
+      builder: (context, transition) {
+        return ClipRRect(
+          borderRadius: BorderRadius.circular(8.0),
+          child: Material(
+            color: Colors.white,
+            child: Container(
+              height: 200.0,
+              color: Colors.white,
+              child: Column(
+                children: [
+                  ListTile(
+                    title: Text('Home'),
+                    subtitle: Text('more info here........'),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -75,10 +135,9 @@ class _SearchScreenState extends State<SearchScreen> {
           );
         } else {
           return ClipRRect(
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(10.0),
             child: Material(
               color: Colors.white,
-              elevation: 4.0,
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: List<Widget>.generate(
@@ -86,17 +145,40 @@ class _SearchScreenState extends State<SearchScreen> {
                   (index) {
                     return Column(
                       children: [
-                        SkeletonAnimation(
-                          child: Container(
-                            height: size.height * 0.1,
-                            width: size.width * 0.9,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10.0),
-                              color: Colors.grey,
+                        Container(
+                          color: Colors.transparent,
+                          height: size.height * 0.09,
+                          width: size.width * 0.9,
+                          child: ListTile(
+                            leading: Icon(Icons.location_pin),
+                            title: Padding(
+                              padding: EdgeInsets.only(top: size.height * 0.01),
+                              child: SkeletonAnimation(
+                                child: Container(
+                                  height: size.height * 0.022,
+                                  width: size.width * 0.3,
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey[400],
+                                  ),
+                                ),
+                              ),
+                            ),
+                            subtitle: Padding(
+                              padding:
+                                  EdgeInsets.only(top: size.height * 0.014),
+                              child: SkeletonAnimation(
+                                child: Container(
+                                  decoration:
+                                      BoxDecoration(color: Colors.grey[400]),
+                                  height: size.height * 0.022,
+                                ),
+                              ),
                             ),
                           ),
                         ),
-                        Divider()
+                        Divider(
+                          height: size.height * 0.005,
+                        )
                       ],
                     );
                   },

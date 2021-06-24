@@ -39,26 +39,26 @@ class _CentralScreenState extends State<CentralScreen> {
     return [
       PersistentBottomNavBarItem(
         textStyle: TextStyle(fontSize: 15.0),
-        iconSize: 32.0,
+        iconSize: 28.0,
         icon: Icon(Icons.home),
         title: 'Home',
-        activeColorPrimary: Colors.white,
+        activeColorPrimary: Colors.green,
         inactiveColorPrimary: Colors.grey,
       ),
       PersistentBottomNavBarItem(
         textStyle: TextStyle(fontSize: 15.0),
-        iconSize: 32.0,
+        iconSize: 27.0,
         icon: Icon(Icons.location_pin),
-        title: 'Create Route',
-        activeColorPrimary: Colors.white,
+        title: 'Route',
+        activeColorPrimary: Colors.green,
         inactiveColorPrimary: Colors.grey,
       ),
       PersistentBottomNavBarItem(
         textStyle: TextStyle(fontSize: 15.0),
-        iconSize: 32.0,
+        iconSize: 28.0,
         icon: Icon(Icons.settings),
         title: 'Settings',
-        activeColorPrimary: Colors.white,
+        activeColorPrimary: Colors.green,
         inactiveColorPrimary: Colors.grey,
       ),
     ];
@@ -68,7 +68,10 @@ class _CentralScreenState extends State<CentralScreen> {
     return [
       BottomNavigationBarItem(
         label: '',
-        icon: Icon(Icons.home),
+        icon: Icon(
+          Icons.home,
+          size: 10.0,
+        ),
         activeIcon: Icon(Icons.home_filled),
       ),
       BottomNavigationBarItem(
@@ -116,7 +119,7 @@ class _CentralScreenState extends State<CentralScreen> {
         handleAndroidBackButtonPress: true,
         resizeToAvoidBottomInset: true,
         stateManagement: true,
-        navBarHeight: size.height * 0.1,
+        navBarHeight: size.height * 0.07,
         hideNavigationBarWhenKeyboardShows: true,
         margin: EdgeInsets.all(0.0),
         bottomScreenMargin: 0.0,
@@ -141,10 +144,11 @@ class _CentralScreenState extends State<CentralScreen> {
         selectedTabScreenContext: (context) {},
         hideNavigationBar: _hideNavBar,
         decoration: NavBarDecoration(
-          gradient: LinearGradient(
-              colors: [Color(0xffee0290), Color(0xfff186c0)],
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter),
+          colorBehindNavBar: Colors.white,
+          // gradient: LinearGradient(
+          //     colors: [Color(0xffee0290), Color(0xfff186c0)],
+          //     begin: Alignment.topCenter,
+          //     end: Alignment.bottomCenter),
           //borderRadius: BorderRadius.circular(20.0),
         ),
         popAllScreensOnTapOfSelectedTab: true,
