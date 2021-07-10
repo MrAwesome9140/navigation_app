@@ -1,1 +1,1 @@
-# navigation_app
+# The app is in the master branch
