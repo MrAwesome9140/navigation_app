@@ -7,7 +7,6 @@ import 'package:navigation_app/State/route_store.dart';
 import 'package:skeleton_text/skeleton_text.dart';
 
 class SearchScreen extends StatefulWidget {
-
   const SearchScreen({Key? key}) : super(key: key);
 
   @override
@@ -135,8 +134,8 @@ class _SearchScreenState extends State<SearchScreen> {
           return _tempSkeletonOptions(size);
         } else {
           return FutureBuilder(
-              future: _mapService.getSearchResults(
-                  _autoText, _routeStore.curLoc),
+              future:
+                  _mapService.getSearchResults(_autoText, _routeStore.curLoc),
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
                   return ClipRRect(
