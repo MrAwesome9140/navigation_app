@@ -1,6 +1,6 @@
-# navigation_app
+# Navigation App
 
-A new Flutter project.
+An app designed to help you optimize your routes to travel between all locations as fast as possible.
 
 ## Getting Started
 
