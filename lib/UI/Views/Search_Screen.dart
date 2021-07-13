@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
+import 'package:mobx/mobx.dart';
 import 'package:navigation_app/Services/mapbox_service.dart';
+import 'package:navigation_app/State/route_store.dart';
 import 'package:skeleton_text/skeleton_text.dart';
 
 class SearchScreen extends StatefulWidget {
+
+  const SearchScreen({Key? key}) : super(key: key);
+
   @override
   _SearchScreenState createState() => _SearchScreenState();
 }
@@ -11,6 +17,8 @@ class SearchScreen extends StatefulWidget {
 class _SearchScreenState extends State<SearchScreen> {
   FloatingSearchBarController _controller = FloatingSearchBarController();
   MapBoxService _mapService = MapBoxService();
+  String _autoText = "";
+  RouteStore _routeStore = RouteStore();
 
   @override
   void initState() {
@@ -44,7 +52,11 @@ class _SearchScreenState extends State<SearchScreen> {
                   height: size.height * 0.06,
                   width: size.width * 0.85,
                   debounceDelay: const Duration(milliseconds: 500),
-                  onQueryChanged: (query) {},
+                  onQueryChanged: (query) {
+                    setState(() {
+                      _autoText = query;
+                    });
+                  },
                   onFocusChanged: (focus) {},
                   actions: [
                     // FloatingSearchBarAction.back(
@@ -116,78 +128,125 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   Widget _autoCompleteOptions() {
-    return FutureBuilder(
-      builder: (context, snapshot) {
-        var size = MediaQuery.of(context).size;
-        if (snapshot.hasData) {
-          return ClipRRect(
-            borderRadius: BorderRadius.circular(8),
-            child: Material(
-              color: Colors.white,
-              elevation: 4.0,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: Colors.accents.map((color) {
-                  return Container(height: 112, color: color);
-                }).toList(),
-              ),
-            ),
-          );
+    var size = MediaQuery.of(context).size;
+    return Observer(
+      builder: (BuildContext context) {
+        if (_autoText == '') {
+          return _tempSkeletonOptions(size);
         } else {
-          return ClipRRect(
-            borderRadius: BorderRadius.circular(10.0),
-            child: Material(
-              color: Colors.white,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: List<Widget>.generate(
-                  5,
-                  (index) {
-                    return Column(
-                      children: [
-                        Container(
-                          color: Colors.transparent,
-                          height: size.height * 0.09,
-                          width: size.width * 0.9,
-                          child: ListTile(
-                            leading: Icon(Icons.location_pin),
-                            title: Padding(
-                              padding: EdgeInsets.only(top: size.height * 0.01),
-                              child: SkeletonAnimation(
-                                child: Container(
-                                  height: size.height * 0.022,
-                                  width: size.width * 0.3,
-                                  decoration: BoxDecoration(
-                                    color: Colors.grey[400],
+          return FutureBuilder(
+              future: _mapService.getSearchResults(
+                  _autoText, _routeStore.curLoc),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  return ClipRRect(
+                    borderRadius: BorderRadius.circular(10.0),
+                    child: Material(
+                      color: Colors.white,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: List<Widget>.generate(
+                          5,
+                          (index) {
+                            return Column(
+                              children: [
+                                Container(
+                                  color: Colors.transparent,
+                                  height: size.height * 0.09,
+                                  width: size.width * 0.9,
+                                  child: ListTile(
+                                    leading: Icon(Icons.location_pin),
+                                    title: Padding(
+                                      padding: EdgeInsets.only(
+                                          top: size.height * 0.01),
+                                      child: Container(
+                                        height: size.height * 0.022,
+                                        width: size.width * 0.3,
+                                        decoration: BoxDecoration(
+                                          color: Colors.grey[400],
+                                        ),
+                                      ),
+                                    ),
+                                    subtitle: Padding(
+                                      padding: EdgeInsets.only(
+                                          top: size.height * 0.014),
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                            color: Colors.grey[400]),
+                                        height: size.height * 0.022,
+                                      ),
+                                    ),
                                   ),
                                 ),
-                              ),
-                            ),
-                            subtitle: Padding(
-                              padding:
-                                  EdgeInsets.only(top: size.height * 0.014),
-                              child: SkeletonAnimation(
-                                child: Container(
-                                  decoration:
-                                      BoxDecoration(color: Colors.grey[400]),
-                                  height: size.height * 0.022,
+                                Divider(
+                                  height: size.height * 0.005,
                                 ),
-                              ),
+                              ],
+                            );
+                          },
+                        ),
+                      ),
+                    ),
+                  );
+                } else {
+                  return _tempSkeletonOptions(size);
+                }
+              });
+        }
+      },
+    );
+  }
+
+  Widget _tempSkeletonOptions(Size size) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(10.0),
+      child: Material(
+        color: Colors.white,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: List<Widget>.generate(
+            5,
+            (index) {
+              return Column(
+                children: [
+                  Container(
+                    color: Colors.transparent,
+                    height: size.height * 0.09,
+                    width: size.width * 0.9,
+                    child: ListTile(
+                      leading: Icon(Icons.location_pin),
+                      title: Padding(
+                        padding: EdgeInsets.only(top: size.height * 0.01),
+                        child: SkeletonAnimation(
+                          child: Container(
+                            height: size.height * 0.022,
+                            width: size.width * 0.3,
+                            decoration: BoxDecoration(
+                              color: Colors.grey[400],
                             ),
                           ),
                         ),
-                        Divider(
-                          height: size.height * 0.005,
-                        )
-                      ],
-                    );
-                  },
-                ),
-              ),
-            ),
-          );
-        }
-      },
+                      ),
+                      subtitle: Padding(
+                        padding: EdgeInsets.only(top: size.height * 0.014),
+                        child: SkeletonAnimation(
+                          child: Container(
+                            decoration: BoxDecoration(color: Colors.grey[400]),
+                            height: size.height * 0.022,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Divider(
+                    height: size.height * 0.005,
+                  ),
+                ],
+              );
+            },
+          ),
+        ),
+      ),
     );
   }
 }

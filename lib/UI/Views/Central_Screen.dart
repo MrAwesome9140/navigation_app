@@ -1,6 +1,9 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:navigation_app/Services/location_service.dart';
+import 'package:navigation_app/State/route_store.dart';
 import 'package:navigation_app/UI/Views/Home_Screen.dart';
 import 'package:navigation_app/UI/Views/Route_Screen.dart';
 import 'package:navigation_app/UI/Views/Search_Screen.dart';
@@ -18,6 +21,8 @@ class _CentralScreenState extends State<CentralScreen> {
   late PersistentTabController _controller;
   late bool _hideNavBar;
   int _curIndex = 0;
+  final _locationService = LocationService();
+  final RouteStore _routeStore = new RouteStore();
 
   @override
   void initState() {
@@ -81,87 +86,78 @@ class _CentralScreenState extends State<CentralScreen> {
     ];
   }
 
+  Future<Position> getLocation() async {
+    Geolocator.getPositionStream().listen((event) {
+      _routeStore.curLoc = event;
+    });
+    var loc = await _locationService.determinePosition();
+    _routeStore.curLoc = loc;
+    return loc;
+  }
+
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
-    return Scaffold(
-      // appBar: AppBar(
-      //   title: Text(
-      //     "Navigation App",
-      //     style: TextStyle(
-      //       fontWeight: FontWeight.w800,
-      //     ),
-      //   ),
-      // ),
-      // body: _buildScreens()[_curIndex],
-      // bottomNavigationBar: BottomNavigationBar(
-      //   type: BottomNavigationBarType.shifting,
-      //   selectedItemColor: Colors.green,
-      //   unselectedItemColor: Colors.grey,
-      //   items: _navItems(),
-      //   onTap: (index) {
-      //     setState(() {
-      //       _curIndex = index;
-      //     });
-      //   },
-      // ),
-      // floatingActionButton: FloatingActionButton(
-      //   onPressed: () {},
-      // ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      body: PersistentTabView(
-        context,
-        controller: _controller,
-        screens: _buildScreens(),
-        items: _navBarsItems(),
-        confineInSafeArea: true,
-        backgroundColor: Colors.white,
-        handleAndroidBackButtonPress: true,
-        resizeToAvoidBottomInset: true,
-        stateManagement: true,
-        navBarHeight: size.height * 0.07,
-        hideNavigationBarWhenKeyboardShows: true,
-        margin: EdgeInsets.all(0.0),
-        bottomScreenMargin: 0.0,
-        onWillPop: (cont) async {
-          await showDialog(
-            context: context,
-            useSafeArea: true,
-            builder: (con) => Container(
-              height: 50.0,
-              width: 50.0,
-              color: Colors.white,
-              child: ElevatedButton(
-                child: Text("Close"),
-                onPressed: () {
-                  Navigator.pop(context);
-                },
+    return FutureBuilder(
+      future: getLocation(),
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          return Scaffold(
+            floatingActionButtonLocation:
+                FloatingActionButtonLocation.centerDocked,
+            body: PersistentTabView(
+              context,
+              controller: _controller,
+              screens: _buildScreens(),
+              items: _navBarsItems(),
+              confineInSafeArea: true,
+              backgroundColor: Colors.white,
+              handleAndroidBackButtonPress: true,
+              resizeToAvoidBottomInset: true,
+              stateManagement: true,
+              navBarHeight: size.height * 0.07,
+              hideNavigationBarWhenKeyboardShows: true,
+              margin: EdgeInsets.all(0.0),
+              bottomScreenMargin: 0.0,
+              onWillPop: (cont) async {
+                await showDialog(
+                  context: context,
+                  useSafeArea: true,
+                  builder: (con) => Container(
+                    height: 50.0,
+                    width: 50.0,
+                    color: Colors.white,
+                    child: ElevatedButton(
+                      child: Text("Close"),
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                    ),
+                  ),
+                );
+                return false;
+              },
+              selectedTabScreenContext: (context) {},
+              hideNavigationBar: _hideNavBar,
+              decoration: NavBarDecoration(
+                colorBehindNavBar: Colors.white,
               ),
+              popAllScreensOnTapOfSelectedTab: true,
+              itemAnimationProperties: ItemAnimationProperties(
+                duration: Duration(milliseconds: 400),
+                curve: Curves.ease,
+              ),
+              screenTransitionAnimation: ScreenTransitionAnimation(
+                  animateTabTransition: true,
+                  curve: Curves.ease,
+                  duration: Duration(milliseconds: 200)),
+              navBarStyle: NavBarStyle.style9,
             ),
           );
-          return false;
-        },
-        selectedTabScreenContext: (context) {},
-        hideNavigationBar: _hideNavBar,
-        decoration: NavBarDecoration(
-          colorBehindNavBar: Colors.white,
-          // gradient: LinearGradient(
-          //     colors: [Color(0xffee0290), Color(0xfff186c0)],
-          //     begin: Alignment.topCenter,
-          //     end: Alignment.bottomCenter),
-          //borderRadius: BorderRadius.circular(20.0),
-        ),
-        popAllScreensOnTapOfSelectedTab: true,
-        itemAnimationProperties: ItemAnimationProperties(
-          duration: Duration(milliseconds: 400),
-          curve: Curves.ease,
-        ),
-        screenTransitionAnimation: ScreenTransitionAnimation(
-            animateTabTransition: true,
-            curve: Curves.ease,
-            duration: Duration(milliseconds: 200)),
-        navBarStyle: NavBarStyle.style9,
-      ),
+        } else {
+          return Center(child: CircularProgressIndicator());
+        }
+      },
     );
   }
 }

@@ -6,14 +6,17 @@ import 'package:navigation_app/State/route_store.dart';
 import 'package:flutter_switch/flutter_switch.dart';
 
 class RouteScreen extends StatefulWidget {
+
+  const RouteScreen({Key? key}) : super(key: key);
+
   @override
   _RouteScreenState createState() => _RouteScreenState();
 }
 
 class _RouteScreenState extends State<RouteScreen> {
-  RouteStore _routeStore = RouteStore();
   bool _switch1State = false;
   bool _switch2State = false;
+  RouteStore _routeStore = RouteStore();
 
   @override
   Widget build(BuildContext context) {
@@ -38,6 +41,10 @@ class _RouteScreenState extends State<RouteScreen> {
     );
   }
 
+  Widget _startLocation(Size size) {
+    return Container();
+  }
+
   Widget _locationsDisplay(Size size) {
     return Container(
       decoration: BoxDecoration(color: Colors.grey),
@@ -49,7 +56,12 @@ class _RouteScreenState extends State<RouteScreen> {
             child: ListTile(
               tileColor: Colors.blue,
               leading: Icon(Icons.location_pin),
-              title: Text(''),
+              title: Builder(
+                builder: (cont) {
+                  var loc = _routeStore.locs[_routeStore.route[index]];
+                  return Text(loc!.first);
+                },
+              ),
             ),
           );
         }),
@@ -88,11 +100,7 @@ class _RouteScreenState extends State<RouteScreen> {
                     width: size.width * 0.85,
                     debounceDelay: const Duration(milliseconds: 500),
                     onQueryChanged: (query) {},
-                    onFocusChanged: (focus) {
-                      Navigator.of(context).push(MaterialPageRoute(
-                        builder: (_) => SearchScreen(),
-                      ));
-                    },
+                    onFocusChanged: (focus) {},
                     leadingActions: [],
                     builder: (context, transition) {
                       return ClipRRect(
@@ -120,75 +128,77 @@ class _RouteScreenState extends State<RouteScreen> {
   }
 
   Widget _routeSettings(Size size) {
-    return Column(children: [
-      Padding(
-        padding: EdgeInsets.only(top: size.height * 0.03),
-        child: SizedBox(
-          height: size.height * 0.07,
-          width: size.width * 0.85,
-          child: Text(
-            'Route Settings',
-            style: TextStyle(fontSize: 30.0, fontWeight: FontWeight.w600),
+    return Column(
+      children: [
+        Padding(
+          padding: EdgeInsets.only(top: size.height * 0.03),
+          child: SizedBox(
+            height: size.height * 0.07,
+            width: size.width * 0.85,
+            child: Text(
+              'Route Settings',
+              style: TextStyle(fontSize: 30.0, fontWeight: FontWeight.w600),
+            ),
           ),
         ),
-      ),
-      Padding(
-        padding: EdgeInsets.only(),
-        child: Column(
-          children: [
-            Container(
-              height: size.height * 0.06,
-              width: size.width * 0.9,
-              child: ListTile(
-                leading: Icon(Icons.settings),
-                title: Container(
-                  width: size.width * 0.6,
-                  child: Text(
-                    'Optimize Route',
-                    style: TextStyle(
-                      fontSize: 20.0,
-                      fontWeight: FontWeight.w300,
+        Padding(
+          padding: EdgeInsets.only(),
+          child: Column(
+            children: [
+              Container(
+                height: size.height * 0.06,
+                width: size.width * 0.9,
+                child: ListTile(
+                  leading: Icon(Icons.settings),
+                  title: Container(
+                    width: size.width * 0.6,
+                    child: Text(
+                      'Optimize Route',
+                      style: TextStyle(
+                        fontSize: 20.0,
+                        fontWeight: FontWeight.w300,
+                      ),
                     ),
                   ),
-                ),
-                trailing: Switch(
-                  value: _switch1State,
-                  onChanged: (val) {
-                    setState(() {
-                      _switch1State = val;
-                    });
-                  },
-                ),
-              ),
-            ),
-            Container(
-              height: size.height * 0.06,
-              width: size.width * 0.9,
-              child: ListTile(
-                leading: Icon(Icons.location_pin),
-                title: Container(
-                  width: size.width * 0.6,
-                  child: Text(
-                    'End at Start Location',
-                    style: TextStyle(
-                      fontSize: 20.0,
-                      fontWeight: FontWeight.w300,
-                    ),
+                  trailing: Switch(
+                    value: _switch1State,
+                    onChanged: (val) {
+                      setState(() {
+                        _switch1State = val;
+                      });
+                    },
                   ),
                 ),
-                trailing: Switch(
-                  value: _switch2State,
-                  onChanged: (val) {
-                    setState(() {
-                      _switch2State = val;
-                    });
-                  },
+              ),
+              Container(
+                height: size.height * 0.06,
+                width: size.width * 0.9,
+                child: ListTile(
+                  leading: Icon(Icons.location_pin),
+                  title: Container(
+                    width: size.width * 0.6,
+                    child: Text(
+                      'End at Start Location',
+                      style: TextStyle(
+                        fontSize: 20.0,
+                        fontWeight: FontWeight.w300,
+                      ),
+                    ),
+                  ),
+                  trailing: Switch(
+                    value: _switch2State,
+                    onChanged: (val) {
+                      setState(() {
+                        _switch2State = val;
+                      });
+                    },
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
-      )
-    ]);
+      ],
+    );
   }
 }
