@@ -42,31 +42,68 @@ class _RouteScreenState extends State<RouteScreen> {
   }
 
   Widget _startLocation(Size size) {
-    return Container();
+    return Container(
+      height: size.height * 0.1,
+      width: size.width * 0.9,
+      color: Colors.transparent,
+      child: Column(
+        children: [
+          Padding(
+            padding: EdgeInsets.only(top: size.height * 0.03),
+            child: SizedBox(
+              height: size.height * 0.07,
+              width: size.width * 0.85,
+              child: Text(
+                'Start Location',
+                style: TextStyle(fontSize: 30.0, fontWeight: FontWeight.w600),
+              ),
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.only(),
+            child: ListTile(
+              leading: Icon(Icons.location_pin),
+              title: Text(_routeStore.startName[0]),
+              subtitle: Text(_routeStore.startName[1]),
+            ),
+          )
+        ],
+      ),
+    );
   }
 
   Widget _locationsDisplay(Size size) {
     return Container(
-      decoration: BoxDecoration(color: Colors.grey),
+      decoration: BoxDecoration(color: Colors.blue),
       height: size.height * 0.3,
       child: ReorderableListView(
         children: List<Widget>.generate(_routeStore.locs.length, (index) {
           return Container(
             key: Key(index.toString()),
             height: size.height * 0.09,
-            child: ListTile(
-              tileColor: Colors.blue,
-              leading: Icon(Icons.location_pin),
-              title: Builder(
-                builder: (cont) {
-                  var loc = _routeStore.locs[index];
-                  return Text(loc!.first);
-                },
-              ),
+            child: Column(
+              children: [
+                ListTile(
+                  tileColor: Colors.blue,
+                  leading: Icon(Icons.location_pin),
+                  title: Text(_routeStore.locs[index]![0]),
+                  subtitle: Text(_routeStore.locs[index]![1]),
+                ),
+                Divider(
+                  height: size.height * 0.005,
+                )
+              ],
             ),
           );
         }),
-        onReorder: (before, after) {},
+        onReorder: (before, after) {
+          setState(() {
+            var temp1 = _routeStore.locs[before] as List<String>;
+            var temp2 = _routeStore.locs[after] as List<String>;
+            _routeStore.locs[before] = temp2;
+            _routeStore.locs[after] = temp1;
+          });
+        },
       ),
     );
   }

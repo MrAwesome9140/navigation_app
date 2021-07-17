@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
-import 'package:mobx/mobx.dart';
 import 'package:navigation_app/Services/mapbox_service.dart';
 import 'package:navigation_app/State/route_store.dart';
 import 'package:skeleton_text/skeleton_text.dart';
@@ -135,7 +136,7 @@ class _SearchScreenState extends State<SearchScreen> {
         } else {
           return FutureBuilder(
               future:
-                  _mapService.getSearchResults(_autoText, _routeStore.curLoc),
+                  _mapService.getSearchResults(_autoText, Position(accuracy: 0.0, altitude: 0.0, heading: 0.0, latitude: _routeStore.curLoc.latitude, longitude: _routeStore.curLoc.longitude, speed: 0.0, speedAccuracy: 0.0, timestamp: null)),
               builder: (context, snapshot) {
                 if (snapshot.hasData && snapshot.data != null) {
                   var suggestions = snapshot.data as List<List<String>>;
@@ -145,59 +146,57 @@ class _SearchScreenState extends State<SearchScreen> {
                       color: Colors.white,
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
-                        children: List<Widget>.generate(
-                          5,
-                          (index) {
-                            return Column(
-                              children: [
-                                InkWell(
-                                  onTap: () {
-                                    _routeStore.locs[_routeStore.locs.length] =
-                                        [
-                                      suggestions[0][index],
-                                      suggestions[1][index]
-                                    ];
-                                    _controller.close();
-                                  },
-                                  child: Container(
-                                    color: Colors.transparent,
-                                    height: size.height * 0.09,
-                                    width: size.width * 0.9,
-                                    child: ListTile(
-                                      leading: Icon(Icons.location_pin),
-                                      title: Padding(
-                                        padding: EdgeInsets.only(
-                                            top: size.height * 0.01),
-                                        child: Container(
-                                          child: Text(suggestions[0][index]),
-                                          height: size.height * 0.022,
-                                          width: size.width * 0.3,
-                                          decoration: BoxDecoration(
-                                            color: Colors.transparent,
-                                          ),
+                        children: List<Widget>.generate(5, (index) {
+                          return Column(
+                            children: [
+                              InkWell(
+                                onTap: () async {
+                                  _routeStore.locs[_routeStore.locs.length] = [
+                                    suggestions[0][index],
+                                    suggestions[1][index]
+                                  ];
+                                  List<Location> locations = await locationFromAddress(suggestions[1][index], localeIdentifier: "en_US");
+                                  _routeStore.coords[_routeStore.coords.length] = locations.first;
+                                  _controller.close();
+                                },
+                                child: Container(
+                                  color: Colors.transparent,
+                                  height: size.height * 0.09,
+                                  width: size.width * 0.9,
+                                  child: ListTile(
+                                    leading: Icon(Icons.location_pin),
+                                    title: Padding(
+                                      padding: EdgeInsets.only(
+                                          top: size.height * 0.01),
+                                      child: Container(
+                                        child: Text(suggestions[0][index]),
+                                        height: size.height * 0.022,
+                                        width: size.width * 0.3,
+                                        decoration: BoxDecoration(
+                                          color: Colors.transparent,
                                         ),
                                       ),
-                                      subtitle: Padding(
-                                        padding: EdgeInsets.only(
-                                            top: size.height * 0.014),
-                                        child: Container(
-                                          child: Text(suggestions[1][index]),
-                                          decoration: BoxDecoration(
-                                            color: Colors.transparent,
-                                          ),
-                                          height: size.height * 0.022,
+                                    ),
+                                    subtitle: Padding(
+                                      padding: EdgeInsets.only(
+                                          top: size.height * 0.014),
+                                      child: Container(
+                                        child: Text(suggestions[1][index]),
+                                        decoration: BoxDecoration(
+                                          color: Colors.transparent,
                                         ),
+                                        height: size.height * 0.022,
                                       ),
                                     ),
                                   ),
                                 ),
-                                Divider(
-                                  height: size.height * 0.005,
-                                ),
-                              ],
-                            );
-                          },
-                        ),
+                              ),
+                              Divider(
+                                height: size.height * 0.005,
+                              ),
+                            ],
+                          );
+                        }),
                       ),
                     ),
                   );

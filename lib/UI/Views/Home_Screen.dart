@@ -28,13 +28,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void initState() {
-    _curLoc = getLocation();
     super.initState();
-  }
-
-  Future<Position> getLocation() async {
-    var loc = await _locationService.determinePosition();
-    return loc;
   }
 
   @override

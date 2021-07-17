@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:navigation_app/Services/location_service.dart';
 import 'package:navigation_app/State/route_store.dart';
@@ -86,11 +87,12 @@ class _CentralScreenState extends State<CentralScreen> {
     ];
   }
 
-  Future<Position> getLocation() async {
+  Future<Location> getLocation() async {
     Geolocator.getPositionStream().listen((event) {
-      _routeStore.curLoc = event;
+      _routeStore.curLoc = Location(timestamp: DateTime.now(), latitude: event.latitude, longitude: event.longitude);
     });
-    var loc = await _locationService.determinePosition();
+    var locs = await _locationService.determinePosition();
+    var loc = Location(timestamp: DateTime.now(), latitude: locs.latitude, longitude: locs.longitude,);
     _routeStore.curLoc = loc;
     return loc;
   }

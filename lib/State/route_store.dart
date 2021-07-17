@@ -1,3 +1,4 @@
+import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:mobx/mobx.dart';
 import 'package:navigation_app/Models/graph.dart';
@@ -21,13 +22,14 @@ abstract class _RouteStore with Store {
   Map<int, List<String>> locs = new Map<int, List<String>>();
 
   @observable
-  Position curLoc = Position(
-      timestamp: null,
-      latitude: 0.0,
-      longitude: 0.0,
-      heading: 0.0,
-      speed: 0.0,
-      speedAccuracy: 0.0,
-      accuracy: 0.0,
-      altitude: 0.0);
+  Map<int, Location> coords = new Map();
+
+  @observable
+  Location startLoc = Location(timestamp: DateTime.now(), latitude: 0.0, longitude: 0.0);
+
+  @observable
+  List<String> startName = [];
+
+  @observable
+  Location curLoc = Location(timestamp: DateTime.now(), latitude: 0.0, longitude: 0.0);
 }
