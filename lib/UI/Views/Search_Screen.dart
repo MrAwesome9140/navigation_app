@@ -137,7 +137,8 @@ class _SearchScreenState extends State<SearchScreen> {
               future:
                   _mapService.getSearchResults(_autoText, _routeStore.curLoc),
               builder: (context, snapshot) {
-                if (snapshot.hasData) {
+                if (snapshot.hasData && snapshot.data != null) {
+                  var suggestions = snapshot.data as List<List<String>>;
                   return ClipRRect(
                     borderRadius: BorderRadius.circular(10.0),
                     child: Material(
@@ -149,30 +150,43 @@ class _SearchScreenState extends State<SearchScreen> {
                           (index) {
                             return Column(
                               children: [
-                                Container(
-                                  color: Colors.transparent,
-                                  height: size.height * 0.09,
-                                  width: size.width * 0.9,
-                                  child: ListTile(
-                                    leading: Icon(Icons.location_pin),
-                                    title: Padding(
-                                      padding: EdgeInsets.only(
-                                          top: size.height * 0.01),
-                                      child: Container(
-                                        height: size.height * 0.022,
-                                        width: size.width * 0.3,
-                                        decoration: BoxDecoration(
-                                          color: Colors.grey[400],
+                                InkWell(
+                                  onTap: () {
+                                    _routeStore.locs[_routeStore.locs.length] =
+                                        [
+                                      suggestions[0][index],
+                                      suggestions[1][index]
+                                    ];
+                                    _controller.close();
+                                  },
+                                  child: Container(
+                                    color: Colors.transparent,
+                                    height: size.height * 0.09,
+                                    width: size.width * 0.9,
+                                    child: ListTile(
+                                      leading: Icon(Icons.location_pin),
+                                      title: Padding(
+                                        padding: EdgeInsets.only(
+                                            top: size.height * 0.01),
+                                        child: Container(
+                                          child: Text(suggestions[0][index]),
+                                          height: size.height * 0.022,
+                                          width: size.width * 0.3,
+                                          decoration: BoxDecoration(
+                                            color: Colors.transparent,
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                    subtitle: Padding(
-                                      padding: EdgeInsets.only(
-                                          top: size.height * 0.014),
-                                      child: Container(
-                                        decoration: BoxDecoration(
-                                            color: Colors.grey[400]),
-                                        height: size.height * 0.022,
+                                      subtitle: Padding(
+                                        padding: EdgeInsets.only(
+                                            top: size.height * 0.014),
+                                        child: Container(
+                                          child: Text(suggestions[1][index]),
+                                          decoration: BoxDecoration(
+                                            color: Colors.transparent,
+                                          ),
+                                          height: size.height * 0.022,
+                                        ),
                                       ),
                                     ),
                                   ),

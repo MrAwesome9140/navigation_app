@@ -6,7 +6,6 @@ import 'package:navigation_app/State/route_store.dart';
 import 'package:flutter_switch/flutter_switch.dart';
 
 class RouteScreen extends StatefulWidget {
-
   const RouteScreen({Key? key}) : super(key: key);
 
   @override
@@ -31,6 +30,7 @@ class _RouteScreenState extends State<RouteScreen> {
             child: Column(
               children: [
                 _routeSettings(size),
+                _startLocation(size),
                 _locationsDisplay(size),
               ],
             ),
@@ -50,15 +50,16 @@ class _RouteScreenState extends State<RouteScreen> {
       decoration: BoxDecoration(color: Colors.grey),
       height: size.height * 0.3,
       child: ReorderableListView(
-        children: List<Widget>.generate(_routeStore.route.length, (index) {
+        children: List<Widget>.generate(_routeStore.locs.length, (index) {
           return Container(
+            key: Key(index.toString()),
             height: size.height * 0.09,
             child: ListTile(
               tileColor: Colors.blue,
               leading: Icon(Icons.location_pin),
               title: Builder(
                 builder: (cont) {
-                  var loc = _routeStore.locs[_routeStore.route[index]];
+                  var loc = _routeStore.locs[index];
                   return Text(loc!.first);
                 },
               ),

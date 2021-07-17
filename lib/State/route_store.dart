@@ -17,13 +17,8 @@ class RouteStore extends _RouteStore with _$RouteStore {
 }
 
 abstract class _RouteStore with Store {
-
-
   @observable
-  List<SpecialVertex> route = [];
-
-  @observable
-  Map<String, List<String>> locs = new Map<String, List<String>>();
+  Map<int, List<String>> locs = new Map<int, List<String>>();
 
   @observable
   Position curLoc = Position(

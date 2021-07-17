@@ -9,7 +9,6 @@ import 'package:navigation_app/UI/Views/Route_Screen.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
 class HomeScreen extends StatefulWidget {
-
   const HomeScreen({Key? key}) : super(key: key);
 
   @override

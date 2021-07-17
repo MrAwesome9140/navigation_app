@@ -10,7 +10,7 @@ import 'graph_operations.dart';
 class MapBoxService {
   final String _baseUrl = "api.mapbox.com";
   final String _mapBoxKey =
-      "pk.eyJ1IjoibXJhd2Vzb21lOTEwNCIsImEiOiJja2J5YzdhMHQweWt4MnFueHc1OTFvcnp2In0.u0DMnW57LGE7aEYj9uo-WQ";
+      "pk.eyJ1IjoibXJhd2Vzb21lOTEwNCIsImEiOiJja3Bibm94eWMwenFoMnVueGFpdWQ4YW4zIn0.LLg54LGkURVdJeORIdo9MA";
   late List<SpecialVertex> optimalPath;
   late double weights;
 
@@ -114,6 +114,7 @@ class MapBoxService {
 
     var response = await http.get(Uri.https(_baseUrl, _extension, params));
     var decoded = json.decode(response.body);
+    print(decoded.toString());
     var features = decoded["features"] as List<dynamic>;
     features.forEach((element) {
       placeNames.add(element["text"]);
