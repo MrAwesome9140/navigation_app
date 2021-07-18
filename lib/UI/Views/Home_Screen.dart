@@ -33,40 +33,27 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: _curLoc,
-      builder: (context, data) {
-        if (data.hasData) {
+    // return FutureBuilder(
+    //   future: _curLoc,
+    //   builder: (context, data) {
+    //     if (data.hasData) {
           return Scaffold(
             body: Stack(
               children: [
-                Map(data),
+                Map(),
               ],
             ),
-            // floatingActionButtonLocation:
-            //     FloatingActionButtonLocation.centerDocked,
-            // floatingActionButton: FloatingActionButton.extended(
-            //     shape: RoundedRectangleBorder(
-            //         borderRadius: BorderRadius.all(Radius.circular(30.0))),
-            //     onPressed: () {
-            //       Navigator.of(context).push(_createRoute());
-            //     },
-            //     label: Text(
-            //       "Create Route",
-            //       style: TextStyle(fontSize: 20.0),
-            //     ),
-            // ),
           );
-        } else {
-          return Center(child: CircularProgressIndicator());
-        }
-      },
-    );
+    //     } else {
+    //       return Center(child: CircularProgressIndicator());
+    //     }
+    //   },
+    // );
   }
 
-  Widget Map(AsyncSnapshot<Object?> data) {
+  Widget Map() {
     var pos = _routeStore.curLoc;
-    var loc = data.data as Position;
+    //var loc = data.data as Position;
     return GoogleMap(
       onMapCreated: (controller) {
         _controller.complete(controller);

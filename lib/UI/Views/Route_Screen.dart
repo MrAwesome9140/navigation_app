@@ -1,6 +1,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
+import 'package:navigation_app/Services/mapbox_service.dart';
 import 'package:navigation_app/UI/Views/Search_Screen.dart';
 import 'package:navigation_app/State/route_store.dart';
 import 'package:flutter_switch/flutter_switch.dart';
@@ -13,9 +14,10 @@ class RouteScreen extends StatefulWidget {
 }
 
 class _RouteScreenState extends State<RouteScreen> {
-  bool _switch1State = false;
+  var _switch1State = false;
   bool _switch2State = false;
   RouteStore _routeStore = RouteStore();
+  MapBoxService _mapBoxService = MapBoxService();
 
   @override
   Widget build(BuildContext context) {
@@ -32,6 +34,7 @@ class _RouteScreenState extends State<RouteScreen> {
                 _routeSettings(size),
                 _startLocation(size),
                 _locationsDisplay(size),
+                _startButton(size),
               ],
             ),
           ),
@@ -43,7 +46,7 @@ class _RouteScreenState extends State<RouteScreen> {
 
   Widget _startLocation(Size size) {
     return Container(
-      height: size.height * 0.1,
+      height: size.height * 0.16,
       width: size.width * 0.9,
       color: Colors.transparent,
       child: Column(
@@ -51,7 +54,7 @@ class _RouteScreenState extends State<RouteScreen> {
           Padding(
             padding: EdgeInsets.only(top: size.height * 0.03),
             child: SizedBox(
-              height: size.height * 0.07,
+              height: size.height * 0.06,
               width: size.width * 0.85,
               child: Text(
                 'Start Location',
@@ -61,10 +64,19 @@ class _RouteScreenState extends State<RouteScreen> {
           ),
           Padding(
             padding: EdgeInsets.only(),
-            child: ListTile(
-              leading: Icon(Icons.location_pin),
-              title: Text(_routeStore.startName[0]),
-              subtitle: Text(_routeStore.startName[1]),
+            child: Container(
+              height: size.height * 0.07,
+              decoration: BoxDecoration(
+                  border: Border.all(color: Colors.black, width: 2.0)),
+              child: ListTile(
+                leading: Icon(Icons.location_pin),
+                title: Text(_routeStore.startName.length != 0
+                    ? _routeStore.startName[0]
+                    : ""),
+                subtitle: Text(_routeStore.startName.length != 0
+                    ? _routeStore.startName[1]
+                    : ""),
+              ),
             ),
           )
         ],
@@ -72,39 +84,115 @@ class _RouteScreenState extends State<RouteScreen> {
     );
   }
 
-  Widget _locationsDisplay(Size size) {
-    return Container(
-      decoration: BoxDecoration(color: Colors.blue),
-      height: size.height * 0.3,
-      child: ReorderableListView(
-        children: List<Widget>.generate(_routeStore.locs.length, (index) {
-          return Container(
-            key: Key(index.toString()),
-            height: size.height * 0.09,
-            child: Column(
-              children: [
-                ListTile(
-                  tileColor: Colors.blue,
-                  leading: Icon(Icons.location_pin),
-                  title: Text(_routeStore.locs[index]![0]),
-                  subtitle: Text(_routeStore.locs[index]![1]),
-                ),
-                Divider(
-                  height: size.height * 0.005,
-                )
-              ],
-            ),
-          );
-        }),
-        onReorder: (before, after) {
-          setState(() {
-            var temp1 = _routeStore.locs[before] as List<String>;
-            var temp2 = _routeStore.locs[after] as List<String>;
-            _routeStore.locs[before] = temp2;
-            _routeStore.locs[after] = temp1;
-          });
-        },
+  Widget _startButton(Size size) {
+    return Padding(
+      padding: EdgeInsets.only(top: size.height * 0.02),
+      child: Container(
+        height: size.height * 0.075,
+        width: size.width,
+        color: Colors.transparent,
+        child: ElevatedButton(
+          style: ButtonStyle(
+              backgroundColor: MaterialStateProperty.all(Colors.green[200])),
+          onPressed: () async {
+
+          },
+          child: Text(
+            'Start Route',
+            style: TextStyle(fontSize: 20.0),
+          ),
+        ),
       ),
+    );
+  }
+
+  Widget _locationsDisplay(Size size) {
+    return Column(
+      children: [
+        Padding(
+          padding: EdgeInsets.only(top: size.height * 0.03),
+          child: SizedBox(
+            height: size.height * 0.06,
+            width: size.width * 0.85,
+            child: Text(
+              'Route',
+              style: TextStyle(fontSize: 30.0, fontWeight: FontWeight.w600),
+            ),
+          ),
+        ),
+        Padding(
+          padding: EdgeInsets.only(),
+          child: Container(
+            decoration: BoxDecoration(color: Colors.blue[100]),
+            height: size.height * 0.25,
+            child: ListView(
+              children: List<Widget>.generate(_routeStore.locs.length, (index) {
+                return Container(
+                  key: Key(index.toString()),
+                  height: size.height * 0.08,
+                  child: Column(
+                    children: [
+                      Container(
+                        child: Row(
+                          children: [
+                            Container(
+                              height: size.height * 0.06,
+                              width: size.width * 0.1,
+                              child: Center(child: Icon(Icons.location_pin)),
+                            ),
+                            Container(
+                              height: size.height * 0.06,
+                              width: size.width * 0.8,
+                              child: Column(
+                                children: [
+                                  Container(
+                                    width: size.width * 0.8,
+                                    height: size.height * 0.03,
+                                    child: Text(
+                                      _routeStore.locs[index]![0],
+                                      style: TextStyle(
+                                          fontSize: 15.0,
+                                          fontWeight: FontWeight.w500),
+                                    ),
+                                  ),
+                                  Container(
+                                    width: size.width * 0.8,
+                                    height: size.height * 0.03,
+                                    child: Text(
+                                      _routeStore.locs[index]![1],
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(
+                            top: size.height * 0.005,
+                            bottom: size.height * 0.01),
+                        child: Divider(
+                          height: size.height * 0.005,
+                        ),
+                      )
+                    ],
+                  ),
+                );
+              }),
+              // onReorder: (before, after) {
+              //   setState(() {
+              //     var temp1 = _routeStore.locs[before] as List<String>;
+              //     var temp2 = _routeStore.locs[after] as List<String>;
+              //     _routeStore.locs[before] = temp2;
+              //     _routeStore.locs[after] = temp1;
+              //   });
+              // },
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -169,9 +257,9 @@ class _RouteScreenState extends State<RouteScreen> {
     return Column(
       children: [
         Padding(
-          padding: EdgeInsets.only(top: size.height * 0.03),
+          padding: EdgeInsets.only(top: size.height * 0.01),
           child: SizedBox(
-            height: size.height * 0.07,
+            height: size.height * 0.05,
             width: size.width * 0.85,
             child: Text(
               'Route Settings',
