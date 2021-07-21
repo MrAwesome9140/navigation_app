@@ -1,15 +1,16 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:navigation_app/Services/location_service.dart';
 import 'package:navigation_app/State/route_store.dart';
 import 'package:navigation_app/UI/Views/Home_Screen.dart';
 import 'package:navigation_app/UI/Views/Route_Screen.dart';
-import 'package:navigation_app/UI/Views/Search_Screen.dart';
 import 'package:navigation_app/UI/Views/Settings_Screen.dart';
 import 'package:persistent_bottom_nav_bar/persistent-tab-view.dart';
+import 'package:step_progress_indicator/step_progress_indicator.dart';
 
 class CentralScreen extends StatefulWidget {
   const CentralScreen({Key? key}) : super(key: key);
@@ -89,10 +90,17 @@ class _CentralScreenState extends State<CentralScreen> {
 
   Future<Location> getLocation() async {
     Geolocator.getPositionStream().listen((event) {
-      _routeStore.curLoc = Location(timestamp: DateTime.now(), latitude: event.latitude, longitude: event.longitude);
+      _routeStore.curLoc = Location(
+          timestamp: DateTime.now(),
+          latitude: event.latitude,
+          longitude: event.longitude);
     });
     var locs = await _locationService.determinePosition();
-    var loc = Location(timestamp: DateTime.now(), latitude: locs.latitude, longitude: locs.longitude,);
+    var loc = Location(
+      timestamp: DateTime.now(),
+      latitude: locs.latitude,
+      longitude: locs.longitude,
+    );
     _routeStore.curLoc = loc;
     return loc;
   }
@@ -100,64 +108,115 @@ class _CentralScreenState extends State<CentralScreen> {
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
-    return FutureBuilder(
-      future: getLocation(),
-      builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          return Scaffold(
-            floatingActionButtonLocation:
-                FloatingActionButtonLocation.centerDocked,
-            body: PersistentTabView(
-              context,
-              controller: _controller,
-              screens: _buildScreens(),
-              items: _navBarsItems(),
-              confineInSafeArea: true,
-              backgroundColor: Colors.white,
-              handleAndroidBackButtonPress: true,
-              resizeToAvoidBottomInset: true,
-              stateManagement: true,
-              navBarHeight: size.height * 0.07,
-              hideNavigationBarWhenKeyboardShows: true,
-              margin: EdgeInsets.all(0.0),
-              bottomScreenMargin: 0.0,
-              onWillPop: (cont) async {
-                await showDialog(
-                  context: context,
-                  useSafeArea: true,
-                  builder: (con) => Container(
-                    height: 50.0,
-                    width: 50.0,
+    return Stack(
+      children: [
+        FutureBuilder(
+          future: getLocation(),
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              return Scaffold(
+                floatingActionButtonLocation:
+                    FloatingActionButtonLocation.centerDocked,
+                body: PersistentTabView(
+                  context,
+                  controller: _controller,
+                  screens: _buildScreens(),
+                  items: _navBarsItems(),
+                  confineInSafeArea: true,
+                  backgroundColor: Colors.white,
+                  handleAndroidBackButtonPress: true,
+                  resizeToAvoidBottomInset: true,
+                  stateManagement: true,
+                  navBarHeight: size.height * 0.07,
+                  hideNavigationBarWhenKeyboardShows: true,
+                  margin: EdgeInsets.all(0.0),
+                  bottomScreenMargin: 0.0,
+                  onWillPop: (cont) async {
+                    await showDialog(
+                      context: context,
+                      useSafeArea: true,
+                      builder: (con) => Container(
+                        height: 50.0,
+                        width: 50.0,
+                        color: Colors.white,
+                        child: ElevatedButton(
+                          child: Text("Close"),
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                        ),
+                      ),
+                    );
+                    return false;
+                  },
+                  selectedTabScreenContext: (context) {},
+                  hideNavigationBar: _hideNavBar,
+                  decoration: NavBarDecoration(
+                    colorBehindNavBar: Colors.white,
+                  ),
+                  popAllScreensOnTapOfSelectedTab: true,
+                  itemAnimationProperties: ItemAnimationProperties(
+                    duration: Duration(milliseconds: 400),
+                    curve: Curves.ease,
+                  ),
+                  screenTransitionAnimation: ScreenTransitionAnimation(
+                      animateTabTransition: true,
+                      curve: Curves.ease,
+                      duration: Duration(milliseconds: 200)),
+                  navBarStyle: NavBarStyle.style9,
+                ),
+              );
+            } else {
+              return Center(child: CircularProgressIndicator());
+            }
+          },
+        ),
+        OverlayView(),
+      ],
+    );
+  }
+}
+
+class OverlayView extends StatelessWidget {
+  OverlayView({Key? key}) : super(key: key);
+
+  final RouteStore _routeStore = RouteStore();
+
+  @override
+  Widget build(BuildContext context) {
+    var size = MediaQuery.of(context).size;
+    return Observer(
+      builder: (context) {
+        if (_routeStore.progressOverlay) {
+          return IgnorePointer(
+            child: Container(
+              height: size.height,
+              width: size.width,
+              child: Opacity(
+                opacity: 8.0,
+                child: Center(
+                  child: Container(
                     color: Colors.white,
-                    child: ElevatedButton(
-                      child: Text("Close"),
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
+                    height: size.height*0.2,
+                    width: size.width*0.5,
+                    child: Column(
+                      children: [
+                        Text('Route Optimization Progress'),
+                        StepProgressIndicator(
+                          totalSteps: 6,
+                          currentStep: _routeStore.curStep,
+                          selectedSize: 12,
+                          unselectedSize: 8,
+                        ),
+                      ],
                     ),
                   ),
-                );
-                return false;
-              },
-              selectedTabScreenContext: (context) {},
-              hideNavigationBar: _hideNavBar,
-              decoration: NavBarDecoration(
-                colorBehindNavBar: Colors.white,
+                ),
               ),
-              popAllScreensOnTapOfSelectedTab: true,
-              itemAnimationProperties: ItemAnimationProperties(
-                duration: Duration(milliseconds: 400),
-                curve: Curves.ease,
-              ),
-              screenTransitionAnimation: ScreenTransitionAnimation(
-                  animateTabTransition: true,
-                  curve: Curves.ease,
-                  duration: Duration(milliseconds: 200)),
-              navBarStyle: NavBarStyle.style9,
             ),
           );
         } else {
-          return Center(child: CircularProgressIndicator());
+          return Container();
         }
       },
     );

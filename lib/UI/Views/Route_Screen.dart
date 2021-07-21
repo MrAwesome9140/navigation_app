@@ -1,6 +1,8 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
+import 'package:navigation_app/Models/graph.dart';
 import 'package:navigation_app/Services/mapbox_service.dart';
 import 'package:navigation_app/UI/Views/Search_Screen.dart';
 import 'package:navigation_app/State/route_store.dart';
@@ -95,7 +97,10 @@ class _RouteScreenState extends State<RouteScreen> {
           style: ButtonStyle(
               backgroundColor: MaterialStateProperty.all(Colors.green[200])),
           onPressed: () async {
-
+            _routeStore.flipOverlay();
+            var locs = _routeStore.coords.values as List<Location>;
+            _routeStore.optiRoute = await _mapBoxService.getOptimalPath(locs);
+            print('done');
           },
           child: Text(
             'Start Route',

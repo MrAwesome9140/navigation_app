@@ -25,11 +25,32 @@ abstract class _RouteStore with Store {
   Map<int, Location> coords = new Map();
 
   @observable
-  Location startLoc = Location(timestamp: DateTime.now(), latitude: 0.0, longitude: 0.0);
+  List<SpecialVertex> optiRoute = [];
+
+  @observable
+  Location startLoc =
+      Location(timestamp: DateTime.now(), latitude: 0.0, longitude: 0.0);
 
   @observable
   List<String> startName = [];
 
   @observable
-  Location curLoc = Location(timestamp: DateTime.now(), latitude: 0.0, longitude: 0.0);
+  var progressOverlay = false;
+
+  @observable
+  var curStep = 0;
+
+  @action
+  void flipOverlay() {
+    progressOverlay = !progressOverlay;
+  }
+
+  @action
+  void nextStep() {
+    curStep++;
+  }
+
+  @observable
+  Location curLoc =
+      Location(timestamp: DateTime.now(), latitude: 0.0, longitude: 0.0);
 }

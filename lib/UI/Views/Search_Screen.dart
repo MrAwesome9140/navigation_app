@@ -1,11 +1,14 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 import 'package:navigation_app/Services/mapbox_service.dart';
 import 'package:navigation_app/State/route_store.dart';
 import 'package:skeleton_text/skeleton_text.dart';
+import 'package:step_progress_indicator/step_progress_indicator.dart';
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({Key? key}) : super(key: key);
@@ -19,6 +22,13 @@ class _SearchScreenState extends State<SearchScreen> {
   MapBoxService _mapService = MapBoxService();
   String _autoText = "";
   RouteStore _routeStore = RouteStore();
+  bool _locationVis = false;
+  String _locName = "";
+  String _locAdress = "";
+  Location _locLocation =
+      Location(latitude: 0.0, longitude: 0.0, timestamp: DateTime.now());
+  Set<Marker> _markers = new Set();
+  late GoogleMapController _mapController;
 
   @override
   void initState() {
@@ -33,6 +43,7 @@ class _SearchScreenState extends State<SearchScreen> {
       backgroundColor: Colors.grey[400],
       body: Stack(
         children: [
+          _locationDisplay(),
           Container(
             child: Hero(
               tag: 'SearchBar',
@@ -57,7 +68,11 @@ class _SearchScreenState extends State<SearchScreen> {
                       _autoText = query;
                     });
                   },
-                  onFocusChanged: (focus) {},
+                  onFocusChanged: (focus) {
+                    setState(() {
+                      _locationVis = false;
+                    });
+                  },
                   actions: [
                     // FloatingSearchBarAction.back(
                     //   color: Colors.black,
@@ -75,55 +90,38 @@ class _SearchScreenState extends State<SearchScreen> {
     );
   }
 
-  Widget searchBarUI() {
-    return FloatingSearchBar(
-      hint: 'Search.....',
-      openAxisAlignment: 0.0,
-      axisAlignment: 0.0,
-      scrollPadding: EdgeInsets.only(top: 16, bottom: 20),
-      elevation: 4.0,
-      physics: BouncingScrollPhysics(),
-      onQueryChanged: (query) {
-        //Your methods will be here
-      },
-      transitionCurve: Curves.easeInOut,
-      transitionDuration: Duration(milliseconds: 500),
-      transition: CircularFloatingSearchBarTransition(),
-      debounceDelay: Duration(milliseconds: 500),
-      actions: [
-        FloatingSearchBarAction(
-          showIfOpened: false,
-          child: CircularButton(
-            icon: Icon(Icons.place),
-            onPressed: () {
-              print('Places Pressed');
-            },
-          ),
-        ),
-        FloatingSearchBarAction.searchToClear(
-          showIfClosed: false,
-        ),
-      ],
-      builder: (context, transition) {
-        return ClipRRect(
-          borderRadius: BorderRadius.circular(8.0),
-          child: Material(
-            color: Colors.white,
-            child: Container(
-              height: 200.0,
-              color: Colors.white,
-              child: Column(
-                children: [
-                  ListTile(
-                    title: Text('Home'),
-                    subtitle: Text('more info here........'),
+  Widget _locationDisplay() {
+    var size = MediaQuery.of(context).size;
+    return Align(
+      child: Visibility(
+        visible: _locationVis,
+        child: Padding(
+          padding: EdgeInsets.only(),
+          child: Container(
+            height: size.height * 0.6,
+            width: size.width * 0.9,
+            child: Column(
+              children: [
+                Container(
+                  height: size.height * 0.3,
+                  child: GoogleMap(
+                    onMapCreated: (controller) {
+                      _mapController = controller;
+                    },
+                    initialCameraPosition: CameraPosition(
+                      target:
+                          LatLng(_locLocation.latitude, _locLocation.longitude),
+                      zoom: 12.0,
+                    ),
+                    markers: _markers,
                   ),
-                ],
-              ),
+                ),
+                
+              ],
             ),
           ),
-        );
-      },
+        ),
+      ),
     );
   }
 
@@ -135,8 +133,17 @@ class _SearchScreenState extends State<SearchScreen> {
           return _tempSkeletonOptions(size);
         } else {
           return FutureBuilder(
-              future:
-                  _mapService.getSearchResults(_autoText, Position(accuracy: 0.0, altitude: 0.0, heading: 0.0, latitude: _routeStore.curLoc.latitude, longitude: _routeStore.curLoc.longitude, speed: 0.0, speedAccuracy: 0.0, timestamp: null)),
+              future: _mapService.getSearchResults(
+                  _autoText,
+                  Position(
+                      accuracy: 0.0,
+                      altitude: 0.0,
+                      heading: 0.0,
+                      latitude: _routeStore.curLoc.latitude,
+                      longitude: _routeStore.curLoc.longitude,
+                      speed: 0.0,
+                      speedAccuracy: 0.0,
+                      timestamp: null)),
               builder: (context, snapshot) {
                 if (snapshot.hasData && snapshot.data != null) {
                   var suggestions = snapshot.data as List<List<String>>;
@@ -151,12 +158,27 @@ class _SearchScreenState extends State<SearchScreen> {
                             children: [
                               InkWell(
                                 onTap: () async {
-                                  _routeStore.locs[_routeStore.locs.length] = [
-                                    suggestions[0][index],
-                                    suggestions[1][index]
-                                  ];
-                                  List<Location> locations = await locationFromAddress(suggestions[1][index], localeIdentifier: "en_US");
-                                  _routeStore.coords[_routeStore.coords.length] = locations.first;
+                                  List<Location> locations =
+                                      await locationFromAddress(
+                                          suggestions[1][index],
+                                          localeIdentifier: "en_US");
+                                  _locName = suggestions[0][index];
+                                  _locAdress = suggestions[1][index];
+                                  _locLocation = locations.first;
+                                  setState(() {
+                                    _markers.clear();
+                                    _markers.add(
+                                      Marker(
+                                        markerId: MarkerId("Marker"),
+                                        position: LatLng(_locLocation.latitude,
+                                            _locLocation.longitude),
+                                        icon: BitmapDescriptor
+                                            .defaultMarkerWithHue(
+                                                BitmapDescriptor.hueBlue),
+                                      ),
+                                    );
+                                    _locationVis = true;
+                                  });
                                   _controller.close();
                                 },
                                 child: Container(

@@ -1,9 +1,12 @@
 import 'dart:convert';
 import 'dart:math' as math;
 
+import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:hexcolor/hexcolor.dart' as hex;
 import 'package:http/http.dart' as http;
+import 'package:navigation_app/State/route_store.dart';
 import '../Models/graph.dart';
 import 'graph_operations.dart';
 
@@ -13,6 +16,7 @@ class MapBoxService {
       "pk.eyJ1IjoibXJhd2Vzb21lOTEwNCIsImEiOiJja3Bibm94eWMwenFoMnVueGFpdWQ4YW4zIn0.LLg54LGkURVdJeORIdo9MA";
   late List<SpecialVertex> optimalPath;
   late double weights;
+  RouteStore _routeStore = RouteStore();
 
   Future<List<http.Response>> getDirections(List<Location> coords) async {
     Map<String, String> props = new Map<String, String>();
@@ -49,14 +53,21 @@ class MapBoxService {
     return responses;
   }
 
-  Future<List<Vertex>> getOptimalPath(List<Location> coords) async {
+  Future<List<SpecialVertex>> getOptimalPath(List<Location> coords) async {
     GraphOperations ops = GraphOperations();
     Graph matrix = await getMatrix(coords);
+    _routeStore.nextStep();
     List<Edge> mst = ops.mst(matrix);
+    _routeStore.nextStep();
     Graph oddies = ops.oddDegreeVertGraph(mst, matrix);
+    _routeStore.nextStep();
     List<Edge> perfectMatch = ops.minWeightPerfectMatch(oddies);
+    _routeStore.nextStep();
     Graph multiGraph = ops.uniteMinSpanAndPerMatch(matrix, mst, perfectMatch);
-    return ops.optimumTour(multiGraph);
+    _routeStore.nextStep();
+    List<SpecialVertex> fin = ops.optimumTour(multiGraph);
+    _routeStore.nextStep();
+    return fin;
   }
 
   Graph createGraph(http.Response matrix, Graph myGraph) {
@@ -130,16 +141,16 @@ class MapBoxService {
     return response.body;
   }
 
-  // String getStaticMapImage(
-  //     Position center, double width, double height, int zoomLevel) {
-  //   String temp =
-  //       "https://$_baseUrl/styles/v1/mapbox/streets-v11/static/pin-l+${RgbColor.name("blue").toHexColor().toString()}(${center.longitude},${center.latitude})/${center.longitude},${center.latitude},$zoomLevel/${width.toInt()}x${height.toInt()}@2x?access_token=$_mapBoxKey&logo=false";
-  //   //testStuff(temp);
-  //   return temp;
-  // }
+  String getStaticMapImage(
+      Location center, double width, double height, int zoomLevel) {
+    String temp =
+        "https://$_baseUrl/styles/v1/mapbox/streets-v11/static/pin-l+000024(${center.longitude},${center.latitude})/${center.longitude},${center.latitude},$zoomLevel/${width.toInt()}x${height.toInt()}@2x?access_token=$_mapBoxKey&logo=false";
+    //testStuff(temp);
+    return temp;
+  }
 
-//   String htmlColorNotation(sea. color) =>
-//       color.r.toInt().toRadixString(16) +
-//       color.g.toInt().toRadixString(16) +
-//       color.b.toInt().toRadixString(16);
+  String htmlColorNotation(Color color) =>
+      color.red.toInt().toRadixString(16) +
+      color.green.toInt().toRadixString(16) +
+      color.blue.toInt().toRadixString(16);
 }
