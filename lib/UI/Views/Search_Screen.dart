@@ -29,6 +29,7 @@ class _SearchScreenState extends State<SearchScreen> {
       Location(latitude: 0.0, longitude: 0.0, timestamp: DateTime.now());
   Set<Marker> _markers = new Set();
   late GoogleMapController _mapController;
+  bool _setStart = false;
 
   @override
   void initState() {
@@ -44,44 +45,44 @@ class _SearchScreenState extends State<SearchScreen> {
       body: Stack(
         children: [
           _locationDisplay(),
-          Container(
-            child: Hero(
-              tag: 'SearchBar',
-              child: Padding(
-                padding: EdgeInsets.only(top: size.height * 0.03),
-                // child: searchBarUI()
-                child: FloatingSearchBar(
-                  elevation: 4.0,
-                  openAxisAlignment: 0.0,
-                  controller: _controller,
-                  hint: 'Add Locations...',
-                  scrollPadding: EdgeInsets.only(top: 16, bottom: 20),
-                  transitionDuration: const Duration(milliseconds: 800),
-                  transitionCurve: Curves.easeInOut,
-                  transition: CircularFloatingSearchBarTransition(),
-                  physics: BouncingScrollPhysics(),
-                  height: size.height * 0.06,
-                  width: size.width * 0.85,
-                  debounceDelay: const Duration(milliseconds: 500),
-                  onQueryChanged: (query) {
-                    setState(() {
-                      _autoText = query;
-                    });
-                  },
-                  onFocusChanged: (focus) {
+          Hero(
+            tag: 'SearchBar',
+            child: Padding(
+              padding: EdgeInsets.only(top: size.height * 0.03),
+              // child: searchBarUI()
+              child: FloatingSearchBar(
+                elevation: 4.0,
+                openAxisAlignment: 0.0,
+                controller: _controller,
+                hint: 'Add Locations...',
+                scrollPadding: EdgeInsets.only(top: 16, bottom: 20),
+                transitionDuration: const Duration(milliseconds: 800),
+                transitionCurve: Curves.easeInOut,
+                transition: CircularFloatingSearchBarTransition(),
+                physics: BouncingScrollPhysics(),
+                height: size.height * 0.06,
+                width: size.width * 0.85,
+                debounceDelay: const Duration(milliseconds: 500),
+                onQueryChanged: (query) {
+                  setState(() {
+                    _autoText = query;
+                  });
+                },
+                onFocusChanged: (focus) {
+                  if (focus) {
                     setState(() {
                       _locationVis = false;
                     });
-                  },
-                  actions: [
-                    // FloatingSearchBarAction.back(
-                    //   color: Colors.black,
-                    // )
-                  ],
-                  builder: (context, transition) {
-                    return _autoCompleteOptions();
-                  },
-                ),
+                  }
+                },
+                actions: [
+                  // FloatingSearchBarAction.back(
+                  //   color: Colors.black,
+                  // )
+                ],
+                builder: (context, transition) {
+                  return _autoCompleteOptions();
+                },
               ),
             ),
           ),
@@ -96,13 +97,14 @@ class _SearchScreenState extends State<SearchScreen> {
       child: Visibility(
         visible: _locationVis,
         child: Padding(
-          padding: EdgeInsets.only(),
+          padding: EdgeInsets.only(top: size.height * 0.15),
           child: Container(
-            height: size.height * 0.6,
+            height: size.height * 0.7,
             width: size.width * 0.9,
             child: Column(
               children: [
                 Container(
+                  width: size.width * 0.8,
                   height: size.height * 0.3,
                   child: GoogleMap(
                     onMapCreated: (controller) {
@@ -116,7 +118,143 @@ class _SearchScreenState extends State<SearchScreen> {
                     markers: _markers,
                   ),
                 ),
-                
+                Padding(
+                  padding: EdgeInsets.all(size.height * 0.02),
+                  child: Container(
+                    color: Colors.white,
+                    height: size.height * 0.3,
+                    width: size.width * 0.8,
+                    child: Column(
+                      children: [
+                        Container(
+                          color: Colors.transparent,
+                          height: size.height * 0.09,
+                          width: size.width * 0.9,
+                          child: ListTile(
+                            leading: Icon(Icons.location_pin),
+                            title: Padding(
+                              padding: EdgeInsets.only(top: size.height * 0.01),
+                              child: Container(
+                                child: Text(_locName),
+                                height: size.height * 0.022,
+                                width: size.width * 0.3,
+                                decoration: BoxDecoration(
+                                  color: Colors.transparent,
+                                ),
+                              ),
+                            ),
+                            subtitle: Padding(
+                              padding:
+                                  EdgeInsets.only(top: size.height * 0.014),
+                              child: Container(
+                                child: Text(_locAdress),
+                                decoration: BoxDecoration(
+                                  color: Colors.transparent,
+                                ),
+                                height: size.height * 0.022,
+                              ),
+                            ),
+                          ),
+                        ),
+                        SizedBox(
+                          width: size.width * 0.7,
+                          child: Divider(
+                            thickness: 1.0,
+                            color: Colors.black,
+                          ),
+                        ),
+                        Row(
+                          children: [
+                            Padding(
+                              padding: EdgeInsets.only(
+                                  right: size.width * 0.1,
+                                  left: size.width * 0.08),
+                              child: Text(
+                                'Start Location',
+                                style: TextStyle(fontSize: 16.0),
+                              ),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.only(),
+                              child: Checkbox(
+                                materialTapTargetSize:
+                                    MaterialTapTargetSize.padded,
+                                value: _setStart,
+                                onChanged: (val) {
+                                  setState(() {
+                                    _setStart = val!;
+                                  });
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(
+                          width: size.width * 0.7,
+                          child: Divider(
+                            thickness: 1.0,
+                            color: Colors.black,
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.only(top: size.width * 0.03),
+                          child: Material(
+                            child: InkWell(
+                              splashColor: Colors.green,
+                              onTap: () {
+                                if (_setStart) {
+                                  _routeStore.locs[_routeStore.locs.length] =
+                                      _routeStore.startName;
+                                  _routeStore.coords[_routeStore.locs.length] =
+                                      _routeStore.startLoc;
+                                  _routeStore.startName = [
+                                    _locName,
+                                    _locAdress,
+                                  ];
+                                  _routeStore.startLoc = _locLocation;
+                                } else {
+                                  _routeStore.locs[_routeStore.locs.length] = [
+                                    _locName,
+                                    _locAdress,
+                                  ];
+                                  _routeStore.coords[_routeStore.locs.length] =
+                                      _locLocation;
+                                }
+                              },
+                              child: Ink(
+                                decoration: BoxDecoration(
+                                  color: Colors.blue[300],
+                                ),
+                                height: size.height * 0.08,
+                                width: size.width * 0.6,
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Padding(
+                                      padding: EdgeInsets.only(
+                                          right: size.width * 0.03),
+                                      child: Text(
+                                        'Add Stop',
+                                        style: TextStyle(
+                                            fontSize: 24.0,
+                                            fontWeight: FontWeight.w600),
+                                      ),
+                                    ),
+                                    Icon(
+                                      Icons.add,
+                                      size: 35.0,
+                                    )
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                )
               ],
             ),
           ),
