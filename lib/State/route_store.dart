@@ -19,20 +19,23 @@ class RouteStore extends _RouteStore with _$RouteStore {
 
 abstract class _RouteStore with Store {
   @observable
-  Map<int, List<String>> locs = new Map<int, List<String>>();
+  ObservableMap<int, List<String>> locs = new ObservableMap<int, List<String>>();
+
+  @computed
+  int get locsLength => locs.length;
 
   @observable
-  Map<int, Location> coords = new Map();
+  ObservableMap<int, Location> coords = new ObservableMap();
 
   @observable
-  List<SpecialVertex> optiRoute = [];
+  ObservableList<SpecialVertex> optiRoute = new ObservableList();
 
   @observable
   Location startLoc =
       Location(timestamp: DateTime.now(), latitude: 0.0, longitude: 0.0);
 
   @observable
-  List<String> startName = [];
+  ObservableList<String> startName = new ObservableList();
 
   @observable
   var progressOverlay = false;

@@ -5,6 +5,7 @@ import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
+import 'package:mobx/mobx.dart';
 import 'package:navigation_app/Services/mapbox_service.dart';
 import 'package:navigation_app/State/route_store.dart';
 import 'package:skeleton_text/skeleton_text.dart';
@@ -202,23 +203,31 @@ class _SearchScreenState extends State<SearchScreen> {
                             child: InkWell(
                               splashColor: Colors.green,
                               onTap: () {
-                                if (_setStart) {
-                                  _routeStore.locs[_routeStore.locs.length] =
-                                      _routeStore.startName;
-                                  _routeStore.coords[_routeStore.locs.length] =
-                                      _routeStore.startLoc;
-                                  _routeStore.startName = [
-                                    _locName,
-                                    _locAdress,
-                                  ];
-                                  _routeStore.startLoc = _locLocation;
+                                if (!noRepeats(_locAdress)) {
+                                  showAlertDialog();
                                 } else {
-                                  _routeStore.locs[_routeStore.locs.length] = [
-                                    _locName,
-                                    _locAdress,
-                                  ];
-                                  _routeStore.coords[_routeStore.locs.length] =
-                                      _locLocation;
+                                  if (_setStart) {
+                                    if (_routeStore.startName.length > 0) {
+                                      _routeStore
+                                              .locs[_routeStore.locs.length] =
+                                          _routeStore.startName;
+                                      _routeStore
+                                              .coords[_routeStore.locs.length] =
+                                          _routeStore.startLoc;
+                                    }
+                                    _routeStore.startName = ObservableList.of(
+                                        [_locName, _locAdress]);
+                                    _routeStore.startLoc = _locLocation;
+                                  } else {
+                                    _routeStore.locs[_routeStore.locs.length] =
+                                        [
+                                      _locName,
+                                      _locAdress,
+                                    ];
+                                    _routeStore
+                                            .coords[_routeStore.locs.length] =
+                                        _locLocation;
+                                  }
                                 }
                               },
                               child: Ink(
@@ -260,6 +269,43 @@ class _SearchScreenState extends State<SearchScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  bool noRepeats(String address) {
+    bool test = true;
+    _routeStore.locs.values.forEach((e) {
+      if (e.length > 1 && e[1] == address) {
+        test = false;
+      }
+    });
+    if (_routeStore.startName.length > 1 && _routeStore.startName[1] == address)
+      test = false;
+    return test;
+  }
+
+  void showAlertDialog() {
+    var exitButton = TextButton(
+      child: Text('Okay'),
+      onPressed: () {
+        Navigator.of(context, rootNavigator: true).pop('dialog');
+      },
+    );
+
+    AlertDialog alert = AlertDialog(
+      title: Text('Invalid Input'),
+      content: Text(
+          'The address you have entered has already been added to your route. Please choose a different stop.'),
+      actions: [
+        exitButton,
+      ],
+    );
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return alert;
+      }
     );
   }
 
