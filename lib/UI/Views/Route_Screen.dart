@@ -1,3 +1,4 @@
+import 'package:expandable/expandable.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
@@ -9,6 +10,7 @@ import 'package:navigation_app/Services/mapbox_service.dart';
 import 'package:navigation_app/UI/Views/Search_Screen.dart';
 import 'package:navigation_app/State/route_store.dart';
 import 'package:flutter_switch/flutter_switch.dart';
+import 'package:reorderables/reorderables.dart';
 
 class RouteScreen extends StatefulWidget {
   const RouteScreen({Key? key}) : super(key: key);
@@ -72,22 +74,24 @@ class _RouteScreenState extends State<RouteScreen> {
               height: size.height * 0.07,
               decoration: BoxDecoration(
                   border: Border.all(color: Colors.black, width: 2.0)),
-            child: Row(
+              child: Row(
                 children: [
                   Container(
-                    width: size.width*0.15,
+                    width: size.width * 0.15,
                     child: Center(child: Icon(Icons.location_pin)),
                   ),
                   Container(
-                    width: size.width*0.68,
+                    width: size.width * 0.68,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Padding(
-                          padding: EdgeInsets.only(top:size.height*0.01),
+                          padding: EdgeInsets.only(top: size.height * 0.01),
                           child: Observer(
                             builder: (_) => Text(
-                              _routeStore.startName.length != 0 ? _routeStore.startName[0]: "",
+                              _routeStore.startName.length != 0
+                                  ? _routeStore.startName[0]
+                                  : "",
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(
                                 fontSize: 16.0,
@@ -97,10 +101,12 @@ class _RouteScreenState extends State<RouteScreen> {
                           ),
                         ),
                         Padding(
-                          padding: EdgeInsets.only(top: size.height*0.0045),
+                          padding: EdgeInsets.only(top: size.height * 0.0045),
                           child: Observer(
                             builder: (_) => Text(
-                              _routeStore.startName.length != 0 ? _routeStore.startName[1]: "",
+                              _routeStore.startName.length != 0
+                                  ? _routeStore.startName[1]
+                                  : "",
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
@@ -130,7 +136,8 @@ class _RouteScreenState extends State<RouteScreen> {
           onPressed: () async {
             _routeStore.flipOverlay();
             var locs = _routeStore.coords.values as List<Location>;
-            _routeStore.optiRoute = ObservableList.of(await _mapBoxService.getOptimalPath(locs));
+            _routeStore.optiRoute =
+                ObservableList.of(await _mapBoxService.getOptimalPath(locs));
             print('done');
           },
           child: Text(
@@ -162,63 +169,90 @@ class _RouteScreenState extends State<RouteScreen> {
             decoration: BoxDecoration(color: Colors.blue[100]),
             height: size.height * 0.25,
             child: Observer(
-              builder: (_) => ListView(
-                children: List<Widget>.generate(_routeStore.locs.length, (index) {
-                  return Container(
-                    key: Key(index.toString()),
-                    height: size.height * 0.08,
-                    child: Column(
-                      children: [
-                        Container(
-                          child: Row(
+              builder: (_) => ReorderableWrap(
+                onReorder: (int oldIndex, int newIndex) {
+                  List<String> tempPos = _routeStore.locs[oldIndex]!;
+                  Location tempLoc = _routeStore.coords[oldIndex]!;
+                  _routeStore.locs.update(oldIndex,
+                      (value) => _routeStore.locs[newIndex]!);
+                  _routeStore.coords.update(oldIndex,
+                      (value) => _routeStore.coords[newIndex]!);
+                  _routeStore.locs.update(newIndex, (value) => tempPos);
+                  _routeStore.coords.update(newIndex, (value) => tempLoc);
+                },
+                children:
+                    List<Widget>.generate(_routeStore.locs.length, (index) {
+                  return ExpandableNotifier(
+                    child: Padding(
+                      padding: EdgeInsets.only(
+                          top: size.height * 0.005, bottom: size.height * 0.005),
+                      child: ScrollOnExpand(
+                        scrollOnCollapse: false,
+                        child: Expandable(
+                          expanded: Column(
                             children: [
-                              Container(
-                                height: size.height * 0.06,
-                                width: size.width * 0.1,
-                                child: Center(child: Icon(Icons.location_pin)),
-                              ),
-                              Container(
-                                height: size.height * 0.06,
-                                width: size.width * 0.8,
-                                child: Column(
-                                  children: [
-                                    Container(
-                                      width: size.width * 0.8,
-                                      height: size.height * 0.03,
-                                      child: Observer(
-                                        builder: (_) => Text(
-                                          _routeStore.locs[index]![0],
-                                          style: TextStyle(
-                                              fontSize: 15.0,
-                                              fontWeight: FontWeight.w500),
-                                        ),
-                                      ),
-                                    ),
-                                    Container(
-                                      width: size.width * 0.8,
-                                      height: size.height * 0.03,
-                                      child: Observer(
-                                        builder: (_) => Text(
-                                          _routeStore.locs[index]![1],
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
+                              ExpandableButton(
+                                child: Text('Close'),
                               )
                             ],
                           ),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.only(
-                              top: size.height * 0.005,
-                              bottom: size.height * 0.01),
-                          child: Divider(
-                            height: size.height * 0.005,
+                          collapsed: Container(
+                            color: Colors.blue[100],
+                            key: Key(index.toString()),
+                            height:
+                                index == 0 ? size.height * 0.1 : size.height * 0.065,
+                            child: Column(
+                              children: [
+                                SizedBox(
+                                  height: index == 0 ? size.height * 0.02 : 0,
+                                ),
+                                Row(
+                                  children: [
+                                    Container(
+                                      height: size.height * 0.06,
+                                      width: size.width * 0.1,
+                                      child: Center(child: Icon(Icons.location_pin)),
+                                    ),
+                                    Container(
+                                      height: size.height * 0.06,
+                                      width: size.width * 0.8,
+                                      child: Column(
+                                        children: [
+                                          Container(
+                                            width: size.width * 0.8,
+                                            height: size.height * 0.03,
+                                            child: Observer(
+                                              builder: (_) => Text(
+                                                _routeStore.locs[index]![0],
+                                                style: TextStyle(
+                                                    fontSize: 15.0,
+                                                    fontWeight: FontWeight.w500),
+                                              ),
+                                            ),
+                                          ),
+                                          Container(
+                                            width: size.width * 0.8,
+                                            height: size.height * 0.03,
+                                            child: Observer(
+                                              builder: (_) => Text(
+                                                _routeStore.locs[index]![1],
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    )
+                                  ],
+                                ),
+                                Divider(
+                                  height: size.height * 0.005,
+                                )
+                              ],
+                            ),
                           ),
-                        )
-                      ],
+                        ),
+                      ),
                     ),
                   );
                 }),

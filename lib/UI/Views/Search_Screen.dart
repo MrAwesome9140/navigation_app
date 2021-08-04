@@ -212,7 +212,7 @@ class _SearchScreenState extends State<SearchScreen> {
                                               .locs[_routeStore.locs.length] =
                                           _routeStore.startName;
                                       _routeStore
-                                              .coords[_routeStore.locs.length] =
+                                              .coords[_routeStore.coords.length] =
                                           _routeStore.startLoc;
                                     }
                                     _routeStore.startName = ObservableList.of(
@@ -225,7 +225,7 @@ class _SearchScreenState extends State<SearchScreen> {
                                       _locAdress,
                                     ];
                                     _routeStore
-                                            .coords[_routeStore.locs.length] =
+                                            .coords[_routeStore.coords.length] =
                                         _locLocation;
                                   }
                                 }
