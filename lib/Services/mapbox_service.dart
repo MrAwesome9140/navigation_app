@@ -12,8 +12,7 @@ import 'graph_operations.dart';
 
 class MapBoxService {
   final String _baseUrl = "api.mapbox.com";
-  final String _mapBoxKey =
-      "pk.eyJ1IjoibXJhd2Vzb21lOTEwNCIsImEiOiJja3Bibm94eWMwenFoMnVueGFpdWQ4YW4zIn0.LLg54LGkURVdJeORIdo9MA";
+  final String _mapBoxKey = "pk.eyJ1IjoibXJhd2Vzb21lOTEwNCIsImEiOiJja3Bibm94eWMwenFoMnVueGFpdWQ4YW4zIn0.LLg54LGkURVdJeORIdo9MA";
   late List<SpecialVertex> optimalPath;
   late double weights;
   RouteStore _routeStore = RouteStore();
@@ -27,27 +26,17 @@ class MapBoxService {
     props["geometries"] = "geojson";
     props["steps"] = "true";
     props["banner_instructions"] = "true";
-    final StringBuffer _baseExtension =
-        new StringBuffer("/directions/v5/mapbox/driving/");
+    final StringBuffer _baseExtension = new StringBuffer("/directions/v5/mapbox/driving/");
     for (int i = 0; i < math.min(coords.length, 25); i++) {
       _baseExtension.write("${coords[i].longitude},${coords[i].latitude};");
     }
-    final StringBuffer _baseExtension2 =
-        new StringBuffer("/directions/v5/mapbox/driving/");
+    final StringBuffer _baseExtension2 = new StringBuffer("/directions/v5/mapbox/driving/");
     for (int i = 25; i < coords.length; i++) {
       _baseExtension2.write("${coords[i].longitude},${coords[i].latitude};");
     }
 
-    urls.add(Uri.https(
-        _baseUrl,
-        _baseExtension.toString().substring(0, _baseExtension.length - 1),
-        props));
-    coords.length > 25
-        ? urls.add(Uri.https(
-            _baseUrl,
-            _baseExtension2.toString().substring(0, _baseExtension2.length - 1),
-            props))
-        : print("");
+    urls.add(Uri.https(_baseUrl, _baseExtension.toString().substring(0, _baseExtension.length - 1), props));
+    coords.length > 25 ? urls.add(Uri.https(_baseUrl, _baseExtension2.toString().substring(0, _baseExtension2.length - 1), props)) : print("");
     var responses = await Future.wait(urls.map((e) => http.get(e)));
 
     return responses;
@@ -75,9 +64,7 @@ class MapBoxService {
     List<SpecialVertex> verts = myGraph.vertices;
     var initData = json.decode(first.body);
     var initDurations = initData["durations"] as List<dynamic>;
-    var nums = List<List<double>>.generate(
-        verts.length, (i) => List.generate(verts.length, (_) => 0.0),
-        growable: false);
+    var nums = List<List<double>>.generate(verts.length, (i) => List.generate(verts.length, (_) => 0.0), growable: false);
     for (int i = 0; i < initDurations.length; i++) {
       var tempDur = initDurations[i];
       for (int k = 0; k < tempDur.length; k++) {
@@ -107,13 +94,11 @@ class MapBoxService {
       _extension.write("${element.longitude},${element.latitude};");
     });
 
-    var response = await http.get(Uri.http(
-        _baseOSRM, _extension.toString().substring(0, _extension.length - 1)));
+    var response = await http.get(Uri.http(_baseOSRM, _extension.toString().substring(0, _extension.length - 1)));
     return createGraph(response, myGraph);
   }
 
-  Future<List<List<String>>> getSearchResults(
-      String text, Position curLoc) async {
+  Future<List<List<String>>> getSearchResults(String text, Position curLoc) async {
     var params = Map<String, String>();
     List<String> placeNames = [];
     List<String> addresses = [];
@@ -141,16 +126,11 @@ class MapBoxService {
     return response.body;
   }
 
-  String getStaticMapImage(
-      Location center, double width, double height, int zoomLevel) {
-    String temp =
-        "https://$_baseUrl/styles/v1/mapbox/streets-v11/static/pin-l+000024(${center.longitude},${center.latitude})/${center.longitude},${center.latitude},$zoomLevel/${width.toInt()}x${height.toInt()}@2x?access_token=$_mapBoxKey&logo=false";
+  String getStaticMapImage(Location center, double width, double height, int zoomLevel) {
+    String temp = "https://$_baseUrl/styles/v1/mapbox/streets-v11/static/pin-l+000024(${center.longitude},${center.latitude})/${center.longitude},${center.latitude},$zoomLevel/${width.toInt()}x${height.toInt()}@2x?access_token=$_mapBoxKey&logo=false";
     //testStuff(temp);
     return temp;
   }
 
-  String htmlColorNotation(Color color) =>
-      color.red.toInt().toRadixString(16) +
-      color.green.toInt().toRadixString(16) +
-      color.blue.toInt().toRadixString(16);
+  String htmlColorNotation(Color color) => color.red.toInt().toRadixString(16) + color.green.toInt().toRadixString(16) + color.blue.toInt().toRadixString(16);
 }

@@ -19,13 +19,13 @@ mixin _$RouteStore on _RouteStore, Store {
   final _$locsAtom = Atom(name: '_RouteStore.locs');
 
   @override
-  ObservableMap<int, List<String>> get locs {
+  ObservableList<List<String>> get locs {
     _$locsAtom.reportRead();
     return super.locs;
   }
 
   @override
-  set locs(ObservableMap<int, List<String>> value) {
+  set locs(ObservableList<List<String>> value) {
     _$locsAtom.reportWrite(value, super.locs, () {
       super.locs = value;
     });
@@ -34,13 +34,13 @@ mixin _$RouteStore on _RouteStore, Store {
   final _$coordsAtom = Atom(name: '_RouteStore.coords');
 
   @override
-  ObservableMap<int, Location> get coords {
+  ObservableList<Location> get coords {
     _$coordsAtom.reportRead();
     return super.coords;
   }
 
   @override
-  set coords(ObservableMap<int, Location> value) {
+  set coords(ObservableList<Location> value) {
     _$coordsAtom.reportWrite(value, super.coords, () {
       super.coords = value;
     });

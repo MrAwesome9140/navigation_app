@@ -90,10 +90,7 @@ class _CentralScreenState extends State<CentralScreen> {
 
   Future<Location> getLocation() async {
     Geolocator.getPositionStream().listen((event) {
-      _routeStore.curLoc = Location(
-          timestamp: DateTime.now(),
-          latitude: event.latitude,
-          longitude: event.longitude);
+      _routeStore.curLoc = Location(timestamp: DateTime.now(), latitude: event.latitude, longitude: event.longitude);
     });
     var locs = await _locationService.determinePosition();
     var loc = Location(
@@ -115,8 +112,7 @@ class _CentralScreenState extends State<CentralScreen> {
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               return Scaffold(
-                floatingActionButtonLocation:
-                    FloatingActionButtonLocation.centerDocked,
+                floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
                 body: PersistentTabView(
                   context,
                   controller: _controller,
@@ -159,10 +155,7 @@ class _CentralScreenState extends State<CentralScreen> {
                     duration: Duration(milliseconds: 400),
                     curve: Curves.ease,
                   ),
-                  screenTransitionAnimation: ScreenTransitionAnimation(
-                      animateTabTransition: true,
-                      curve: Curves.ease,
-                      duration: Duration(milliseconds: 200)),
+                  screenTransitionAnimation: ScreenTransitionAnimation(animateTabTransition: true, curve: Curves.ease, duration: Duration(milliseconds: 200)),
                   navBarStyle: NavBarStyle.style9,
                 ),
               );
@@ -171,54 +164,7 @@ class _CentralScreenState extends State<CentralScreen> {
             }
           },
         ),
-        OverlayView(),
       ],
-    );
-  }
-}
-
-class OverlayView extends StatelessWidget {
-  OverlayView({Key? key}) : super(key: key);
-
-  final RouteStore _routeStore = RouteStore();
-
-  @override
-  Widget build(BuildContext context) {
-    var size = MediaQuery.of(context).size;
-    return Observer(
-      builder: (context) {
-        if (_routeStore.progressOverlay) {
-          return IgnorePointer(
-            child: Container(
-              height: size.height,
-              width: size.width,
-              child: Opacity(
-                opacity: 8.0,
-                child: Center(
-                  child: Container(
-                    color: Colors.white,
-                    height: size.height*0.2,
-                    width: size.width*0.5,
-                    child: Column(
-                      children: [
-                        Text('Route Optimization Progress'),
-                        StepProgressIndicator(
-                          totalSteps: 6,
-                          currentStep: _routeStore.curStep,
-                          selectedSize: 12,
-                          unselectedSize: 8,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          );
-        } else {
-          return Container();
-        }
-      },
     );
   }
 }

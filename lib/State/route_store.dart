@@ -19,20 +19,19 @@ class RouteStore extends _RouteStore with _$RouteStore {
 
 abstract class _RouteStore with Store {
   @observable
-  ObservableMap<int, List<String>> locs = new ObservableMap<int, List<String>>();
+  ObservableList<List<String>> locs = new ObservableList<List<String>>();
 
   @computed
   int get locsLength => locs.length;
 
   @observable
-  ObservableMap<int, Location> coords = new ObservableMap();
+  ObservableList<Location> coords = new ObservableList();
 
   @observable
   ObservableList<SpecialVertex> optiRoute = new ObservableList();
 
   @observable
-  Location startLoc =
-      Location(timestamp: DateTime.now(), latitude: 0.0, longitude: 0.0);
+  Location startLoc = Location(timestamp: DateTime.now(), latitude: 0.0, longitude: 0.0);
 
   @observable
   ObservableList<String> startName = new ObservableList();
@@ -54,6 +53,5 @@ abstract class _RouteStore with Store {
   }
 
   @observable
-  Location curLoc =
-      Location(timestamp: DateTime.now(), latitude: 0.0, longitude: 0.0);
+  Location curLoc = Location(timestamp: DateTime.now(), latitude: 0.0, longitude: 0.0);
 }

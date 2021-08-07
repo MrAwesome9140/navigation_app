@@ -11,6 +11,7 @@ import 'package:navigation_app/UI/Views/Search_Screen.dart';
 import 'package:navigation_app/State/route_store.dart';
 import 'package:flutter_switch/flutter_switch.dart';
 import 'package:reorderables/reorderables.dart';
+import 'package:step_progress_indicator/step_progress_indicator.dart';
 
 class RouteScreen extends StatefulWidget {
   const RouteScreen({Key? key}) : super(key: key);
@@ -68,12 +69,10 @@ class _RouteScreenState extends State<RouteScreen> {
               ),
             ),
           ),
-          Padding(
-            padding: EdgeInsets.only(),
-            child: Container(
+          Observer(
+            builder: (context) => Container(
               height: size.height * 0.07,
-              decoration: BoxDecoration(
-                  border: Border.all(color: Colors.black, width: 2.0)),
+              decoration: BoxDecoration(border: Border.all(color: Colors.black, width: 2.0)),
               child: Row(
                 children: [
                   Container(
@@ -89,9 +88,7 @@ class _RouteScreenState extends State<RouteScreen> {
                           padding: EdgeInsets.only(top: size.height * 0.01),
                           child: Observer(
                             builder: (_) => Text(
-                              _routeStore.startName.length != 0
-                                  ? _routeStore.startName[0]
-                                  : "",
+                              _routeStore.startName.length != 0 ? _routeStore.startName[0] : "",
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(
                                 fontSize: 16.0,
@@ -104,9 +101,7 @@ class _RouteScreenState extends State<RouteScreen> {
                           padding: EdgeInsets.only(top: size.height * 0.0045),
                           child: Observer(
                             builder: (_) => Text(
-                              _routeStore.startName.length != 0
-                                  ? _routeStore.startName[1]
-                                  : "",
+                              _routeStore.startName.length != 0 ? _routeStore.startName[1] : "",
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
@@ -131,14 +126,33 @@ class _RouteScreenState extends State<RouteScreen> {
         width: size.width,
         color: Colors.transparent,
         child: ElevatedButton(
-          style: ButtonStyle(
-              backgroundColor: MaterialStateProperty.all(Colors.green[200])),
+          style: ButtonStyle(backgroundColor: MaterialStateProperty.all(Colors.green[200])),
           onPressed: () async {
-            _routeStore.flipOverlay();
-            var locs = _routeStore.coords.values as List<Location>;
-            _routeStore.optiRoute =
-                ObservableList.of(await _mapBoxService.getOptimalPath(locs));
-            print('done');
+            if (_switch1State) {
+              showGeneralDialog(
+                context: context,
+                barrierColor: Colors.black26.withOpacity(0.4),
+                barrierDismissible: false,
+                barrierLabel: 'Progress',
+                transitionDuration: Duration(milliseconds: 500),
+                pageBuilder: (c, __, ___) {
+                  return OverlayView(highCont: context);
+                },
+              );
+              List<Location> _fullCoords = [_routeStore.startLoc];
+              _fullCoords.addAll(_routeStore.coords);
+              List<SpecialVertex> _optiRoute = await _mapBoxService.getOptimalPath(_fullCoords);
+              List<Location> _optimal = [];
+              List<List<String>> _optiNames = [];
+              _optimal.add(_routeStore.startLoc);
+              _optiNames.add(_routeStore.startName);
+              _optiRoute.forEach((element) {
+                _optimal.add(_routeStore.coords[element.label]);
+                _optiNames.add(_routeStore.locs[element.label]);
+              });
+              _routeStore.locs = ObservableList.of(_optiNames);
+              _routeStore.coords = ObservableList.of(_optimal);
+            }
           },
           child: Text(
             'Start Route',
@@ -169,53 +183,95 @@ class _RouteScreenState extends State<RouteScreen> {
             decoration: BoxDecoration(color: Colors.blue[100]),
             height: size.height * 0.25,
             child: Observer(
-              builder: (_) => ReorderableWrap(
+              builder: (_) => ReorderableListView.builder(
+                scrollController: ScrollController(initialScrollOffset: 12),
                 onReorder: (int oldIndex, int newIndex) {
-                  List<String> tempPos = _routeStore.locs[oldIndex]!;
-                  Location tempLoc = _routeStore.coords[oldIndex]!;
-                  _routeStore.locs.update(oldIndex,
-                      (value) => _routeStore.locs[newIndex]!);
-                  _routeStore.coords.update(oldIndex,
-                      (value) => _routeStore.coords[newIndex]!);
-                  _routeStore.locs.update(newIndex, (value) => tempPos);
-                  _routeStore.coords.update(newIndex, (value) => tempLoc);
+                  List<String> tempPos = _routeStore.locs[oldIndex];
+                  Location tempLoc = _routeStore.coords[oldIndex];
+                  _routeStore.locs[oldIndex] = _routeStore.locs[newIndex];
+                  _routeStore.coords[oldIndex] = _routeStore.coords[newIndex];
+                  _routeStore.locs[newIndex] = tempPos;
+                  _routeStore.coords[newIndex] = tempLoc;
                 },
-                children:
-                    List<Widget>.generate(_routeStore.locs.length, (index) {
-                  return ExpandableNotifier(
-                    child: Padding(
-                      padding: EdgeInsets.only(
-                          top: size.height * 0.005, bottom: size.height * 0.005),
-                      child: ScrollOnExpand(
-                        scrollOnCollapse: false,
-                        child: Expandable(
-                          expanded: Column(
-                            children: [
-                              ExpandableButton(
-                                child: Text('Close'),
-                              )
-                            ],
-                          ),
-                          collapsed: Container(
-                            color: Colors.blue[100],
-                            key: Key(index.toString()),
-                            height:
-                                index == 0 ? size.height * 0.1 : size.height * 0.065,
-                            child: Column(
-                              children: [
-                                SizedBox(
-                                  height: index == 0 ? size.height * 0.02 : 0,
+                itemCount: _routeStore.locs.length,
+                itemBuilder: (context, index) {
+                  return Padding(
+                    key: Key(index.toString()),
+                    padding: EdgeInsets.only(), //EdgeInsets.only(top: size.height * 0.005, bottom: size.height * 0.005),
+                    child: Container(
+                      color: Colors.blue[100],
+                      child: ExpansionTile(
+                        children: [
+                          Padding(
+                            padding: EdgeInsets.only(),
+                            child: Container(
+                              height: size.height * 0.05,
+                              width: size.width * 0.9,
+                              child: Align(
+                                alignment: Alignment.center,
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    List<String>? _locName = _routeStore.locs[index];
+                                    Location? _locLocation = _routeStore.coords[index];
+                                    if (_routeStore.startName.length > 0) {
+                                      _routeStore.locs[_routeStore.locs.length] = _routeStore.startName;
+                                      _routeStore.coords[_routeStore.coords.length] = _routeStore.startLoc;
+                                    }
+                                    var temp = _routeStore.locs.length;
+                                    for (int i = index + 1; i < temp; i++) {
+                                      List<String> _locName = _routeStore.locs[i];
+                                      Location _locLocation = _routeStore.coords[i];
+                                      _routeStore.locs[i - 1] = _locName;
+                                      _routeStore.coords[i - 1] = _locLocation;
+                                    }
+                                    _routeStore.locs.remove(_routeStore.locs.length - 1);
+                                    _routeStore.coords.remove(_routeStore.locs.length - 1);
+                                    _routeStore.startName = ObservableList.of(_locName);
+                                    _routeStore.startLoc = _locLocation;
+                                  },
+                                  child: Text('Set as Start Location'),
                                 ),
-                                Row(
-                                  children: [
-                                    Container(
-                                      height: size.height * 0.06,
-                                      width: size.width * 0.1,
-                                      child: Center(child: Icon(Icons.location_pin)),
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.only(),
+                            child: Container(
+                              height: size.height * 0.05,
+                              width: size.width * 0.9,
+                              child: Align(
+                                alignment: Alignment.center,
+                                child: ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    primary: Colors.red,
+                                  ),
+                                  onPressed: () {},
+                                  child: Text('Delete Location'),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                        title: Column(
+                          children: [
+                            SizedBox(
+                              height: index == 0 ? size.height * 0.006 : 0,
+                            ),
+                            Container(
+                              height: size.height * 0.08,
+                              child: Row(
+                                children: [
+                                  Container(
+                                    width: size.width * 0.1,
+                                    child: Padding(
+                                      padding: EdgeInsets.only(bottom: size.height * 0.015),
+                                      child: Icon(Icons.location_pin),
                                     ),
-                                    Container(
-                                      height: size.height * 0.06,
-                                      width: size.width * 0.8,
+                                  ),
+                                  Padding(
+                                    padding: EdgeInsets.only(left: size.width * 0.02, top: size.height * 0.01),
+                                    child: Container(
+                                      width: size.width * 0.68,
                                       child: Column(
                                         children: [
                                           Container(
@@ -223,10 +279,8 @@ class _RouteScreenState extends State<RouteScreen> {
                                             height: size.height * 0.03,
                                             child: Observer(
                                               builder: (_) => Text(
-                                                _routeStore.locs[index]![0],
-                                                style: TextStyle(
-                                                    fontSize: 15.0,
-                                                    fontWeight: FontWeight.w500),
+                                                _routeStore.locs[index][0],
+                                                style: TextStyle(fontSize: 15.0, fontWeight: FontWeight.w500),
                                               ),
                                             ),
                                           ),
@@ -235,27 +289,30 @@ class _RouteScreenState extends State<RouteScreen> {
                                             height: size.height * 0.03,
                                             child: Observer(
                                               builder: (_) => Text(
-                                                _routeStore.locs[index]![1],
+                                                _routeStore.locs[index][1],
                                                 overflow: TextOverflow.ellipsis,
+                                                style: TextStyle(
+                                                  fontSize: 12.0,
+                                                ),
                                               ),
                                             ),
                                           ),
                                         ],
                                       ),
-                                    )
-                                  ],
-                                ),
-                                Divider(
-                                  height: size.height * 0.005,
-                                )
-                              ],
+                                    ),
+                                  )
+                                ],
+                              ),
                             ),
-                          ),
+                            Divider(
+                              height: size.height * 0.005,
+                            ),
+                          ],
                         ),
                       ),
                     ),
                   );
-                }),
+                },
               ),
             ),
           ),
@@ -393,6 +450,89 @@ class _RouteScreenState extends State<RouteScreen> {
           ),
         ),
       ],
+    );
+  }
+}
+
+class OverlayView extends StatelessWidget {
+  BuildContext highCont;
+  var widgetOpacity = 0.0;
+
+  OverlayView({Key? key, required this.highCont}) : super(key: key);
+
+  final RouteStore _routeStore = RouteStore();
+
+  @override
+  Widget build(BuildContext context) {
+    var size = MediaQuery.of(context).size;
+    return Observer(
+      builder: (_) => Center(
+        child: Container(
+          color: Colors.white,
+          height: size.height * 0.3,
+          width: size.width * 0.7,
+          child: Column(
+            children: [
+              Padding(
+                padding: EdgeInsets.only(top: size.height * 0.02),
+                child: Container(
+                  width: size.width * 0.6,
+                  height: size.height * 0.1,
+                  child: Text(
+                    'Route Optimization Progress',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 20.0,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                  ),
+                ),
+              ),
+              Container(
+                height: size.height * 0.08,
+                child: Observer(
+                  builder: (_) {
+                    if (_routeStore.curStep == 6) {
+                      widgetOpacity = 12.0;
+                    }
+                    return AnimatedOpacity(
+                      duration: Duration(seconds: 1),
+                      opacity: widgetOpacity,
+                      onEnd: () {
+                        if (widgetOpacity == 12.0) {
+                          Future.delayed(Duration(milliseconds: 800), () {
+                            Navigator.of(context).pop();
+                          });
+                        }
+                      },
+                      child: StepProgressIndicator(
+                        totalSteps: 6,
+                        currentStep: _routeStore.curStep,
+                        selectedSize: 12,
+                        unselectedSize: 8,
+                      ),
+                    );
+                  },
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.only(top: size.height*0.02),
+                child: Container(
+                  height: size.height * 0.05,
+                  width: size.width * 0.6,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    child: Text('Cancel'),
+                  ),
+                ),
+              )
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
