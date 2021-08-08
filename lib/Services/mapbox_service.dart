@@ -16,6 +16,9 @@ class MapBoxService {
   late List<SpecialVertex> optimalPath;
   late double weights;
   RouteStore _routeStore = RouteStore();
+  BuildContext context;
+
+  MapBoxService({required this.context});
 
   Future<List<http.Response>> getDirections(List<Location> coords) async {
     Map<String, String> props = new Map<String, String>();
@@ -46,16 +49,22 @@ class MapBoxService {
     GraphOperations ops = GraphOperations();
     Graph matrix = await getMatrix(coords);
     _routeStore.nextStep();
+    await Future.delayed(Duration(milliseconds: 500));
     List<Edge> mst = ops.mst(matrix);
     _routeStore.nextStep();
+    await Future.delayed(Duration(milliseconds: 500));
     Graph oddies = ops.oddDegreeVertGraph(mst, matrix);
     _routeStore.nextStep();
+    await Future.delayed(Duration(milliseconds: 500));
     List<Edge> perfectMatch = ops.minWeightPerfectMatch(oddies);
     _routeStore.nextStep();
+    await Future.delayed(Duration(milliseconds: 500));
     Graph multiGraph = ops.uniteMinSpanAndPerMatch(matrix, mst, perfectMatch);
     _routeStore.nextStep();
+    await Future.delayed(Duration(milliseconds: 500));
     List<SpecialVertex> fin = ops.optimumTour(multiGraph);
     _routeStore.nextStep();
+    await Future.delayed(Duration(milliseconds: 500));
     return fin;
   }
 
@@ -64,19 +73,16 @@ class MapBoxService {
     List<SpecialVertex> verts = myGraph.vertices;
     var initData = json.decode(first.body);
     var initDurations = initData["durations"] as List<dynamic>;
-    var nums = List<List<double>>.generate(verts.length, (i) => List.generate(verts.length, (_) => 0.0), growable: false);
+    var nums = List<List<bool>>.generate(verts.length, (i) => List.generate(verts.length, (_) => false), growable: false);
     for (int i = 0; i < initDurations.length; i++) {
       var tempDur = initDurations[i];
       for (int k = 0; k < tempDur.length; k++) {
         if (k != i) {
-          var weight = tempDur[k];
-          if (tempDur[k] is int) {
-            weight = (tempDur[k] as int).toDouble();
+          if (!nums[i][k]) {
+            myGraph.addEdge(verts[i], verts[k], (initDurations[i][k] + initDurations[k][i]) / 2);
+            nums[i][k] = true;
+            nums[k][i] = true;
           }
-          if (nums[i][k] != null)
-            myGraph.addEdge(verts[i], verts[k], (weight + nums[i][k]) / 2);
-          else
-            nums[k][i] = weight;
         }
       }
     }

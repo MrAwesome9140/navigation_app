@@ -20,7 +20,7 @@ class SearchScreen extends StatefulWidget {
 
 class _SearchScreenState extends State<SearchScreen> {
   FloatingSearchBarController _controller = FloatingSearchBarController();
-  MapBoxService _mapService = MapBoxService();
+  late MapBoxService _mapService;
   String _autoText = "";
   RouteStore _routeStore = RouteStore();
   bool _locationVis = false;
@@ -33,8 +33,8 @@ class _SearchScreenState extends State<SearchScreen> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
+    _mapService = MapBoxService(context: context);
   }
 
   @override
@@ -72,6 +72,7 @@ class _SearchScreenState extends State<SearchScreen> {
                   if (focus) {
                     setState(() {
                       _locationVis = false;
+                      _setStart = false;
                     });
                   }
                 },

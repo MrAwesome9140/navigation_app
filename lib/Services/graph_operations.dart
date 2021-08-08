@@ -7,11 +7,10 @@ class GraphOperations {
     List<SpecialVertex> verts = g.vertices;
     done.fillRange(0, done.length, false);
     verts[0].key = 0;
-    PriorityQueue<SpecialVertex> queue =
-        new PriorityQueue<SpecialVertex>((a, b) {
+    PriorityQueue<SpecialVertex> queue = new PriorityQueue<SpecialVertex>((a, b) {
       return a.key.compareTo(b.key);
     })
-          ..addAll(verts);
+      ..addAll(verts);
     while (queue.isNotEmpty) {
       SpecialVertex temp = queue.removeFirst();
       done[temp.label] = true;
@@ -25,9 +24,9 @@ class GraphOperations {
       }
     }
     List<Edge> edges = [];
-    verts.forEach((e) {
-      edges.add(e.track);
-    });
+    for (int i = 1; i < verts.length; i++) {
+      edges.add(verts[i].track);
+    }
     return edges;
   }
 
@@ -77,8 +76,7 @@ class GraphOperations {
     return hamilTour;
   }
 
-  void eulersTour(SpecialVertex initial, Map<Edge, bool> searched,
-      List<SpecialVertex> tour, List<Edge> path, Graph g) {
+  void eulersTour(SpecialVertex initial, Map<Edge, bool> searched, List<SpecialVertex> tour, List<Edge> path, Graph g) {
     SpecialVertex current = initial;
     tour.add(current);
     List<Edge> adjacent = g.adjacentTo(current);
@@ -107,8 +105,7 @@ class GraphOperations {
   }
 
   Graph oddDegreeVertGraph(List<Edge> edges, Graph g) {
-    List<int> degrees =
-        new List<int>.filled(g.vertices.length, 0, growable: false);
+    List<int> degrees = new List<int>.filled(g.vertices.length, 0, growable: false);
     edges.forEach((element) {
       degrees[element.node1.label]++;
       degrees[element.node2.label]++;
@@ -119,8 +116,7 @@ class GraphOperations {
     }
     oddies.vertices.forEach((v) {
       g.adjacentTo(v).forEach((e) {
-        if (oddies.vertices.contains(e.node2))
-          oddies.addEdge(v, e.node2, e.weight);
+        if (oddies.vertices.contains(e.node2)) oddies.addEdge(v, e.node2, e.weight);
       });
     });
     return oddies;
@@ -136,8 +132,7 @@ class GraphOperations {
 
   List<Edge> minWeightPerfectMatch(Graph oddies) {
     List<Edge> match = [];
-    List<bool> matched =
-        new List<bool>.filled(oddies.vertices.last.label + 1, false);
+    List<bool> matched = new List<bool>.filled(oddies.vertices.last.label + 1, false);
     oddies.allEdges.sort((a, b) {
       return a.weight.compareTo(b.weight);
     });

@@ -43,6 +43,7 @@ dependencies:
   reorderables: ^0.4.1
   expandable: ^5.0.1
   flutter_mapbox_navigation: ^0.0.26
+  expansion_tile_card: ^2.0.0
 
 dev_dependencies:
   flutter_test:

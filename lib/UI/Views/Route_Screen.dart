@@ -7,11 +7,13 @@ import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 import 'package:mobx/mobx.dart';
 import 'package:navigation_app/Models/graph.dart';
 import 'package:navigation_app/Services/mapbox_service.dart';
+import 'package:navigation_app/UI/Views/Navigation_Screen.dart';
 import 'package:navigation_app/UI/Views/Search_Screen.dart';
 import 'package:navigation_app/State/route_store.dart';
 import 'package:flutter_switch/flutter_switch.dart';
 import 'package:reorderables/reorderables.dart';
 import 'package:step_progress_indicator/step_progress_indicator.dart';
+import 'package:expansion_tile_card/expansion_tile_card.dart';
 
 class RouteScreen extends StatefulWidget {
   const RouteScreen({Key? key}) : super(key: key);
@@ -24,7 +26,13 @@ class _RouteScreenState extends State<RouteScreen> {
   var _switch1State = false;
   bool _switch2State = false;
   RouteStore _routeStore = RouteStore();
-  MapBoxService _mapBoxService = MapBoxService();
+  late MapBoxService _mapBoxService;
+
+  @override
+  void initState() {
+    super.initState();
+    _mapBoxService = MapBoxService(context: context);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -69,50 +77,48 @@ class _RouteScreenState extends State<RouteScreen> {
               ),
             ),
           ),
-          Observer(
-            builder: (context) => Container(
-              height: size.height * 0.07,
-              decoration: BoxDecoration(border: Border.all(color: Colors.black, width: 2.0)),
-              child: Row(
-                children: [
-                  Container(
-                    width: size.width * 0.15,
-                    child: Center(child: Icon(Icons.location_pin)),
+          Container(
+            height: size.height * 0.07,
+            decoration: BoxDecoration(border: Border.all(color: Colors.black, width: 2.0)),
+            child: Row(
+              children: [
+                Container(
+                  width: size.width * 0.15,
+                  child: Center(child: Icon(Icons.location_pin)),
+                ),
+                Container(
+                  width: size.width * 0.68,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.only(top: size.height * 0.01),
+                        child: Observer(
+                          builder: (_) => Text(
+                            _routeStore.startName.length != 0 ? _routeStore.startName[0] : "",
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontSize: 16.0,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(top: size.height * 0.0045),
+                        child: Observer(
+                          builder: (_) => Text(
+                            _routeStore.startName.length != 0 ? _routeStore.startName[1] : "",
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                  Container(
-                    width: size.width * 0.68,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Padding(
-                          padding: EdgeInsets.only(top: size.height * 0.01),
-                          child: Observer(
-                            builder: (_) => Text(
-                              _routeStore.startName.length != 0 ? _routeStore.startName[0] : "",
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                fontSize: 16.0,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.only(top: size.height * 0.0045),
-                          child: Observer(
-                            builder: (_) => Text(
-                              _routeStore.startName.length != 0 ? _routeStore.startName[1] : "",
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  )
-                ],
-              ),
+                )
+              ],
             ),
-          )
+          ),
         ],
       ),
     );
@@ -129,7 +135,8 @@ class _RouteScreenState extends State<RouteScreen> {
           style: ButtonStyle(backgroundColor: MaterialStateProperty.all(Colors.green[200])),
           onPressed: () async {
             if (_switch1State) {
-              showGeneralDialog(
+              _routeStore.curStep = 0;
+              Future<void> dialog = showGeneralDialog(
                 context: context,
                 barrierColor: Colors.black26.withOpacity(0.4),
                 barrierDismissible: false,
@@ -144,15 +151,14 @@ class _RouteScreenState extends State<RouteScreen> {
               List<SpecialVertex> _optiRoute = await _mapBoxService.getOptimalPath(_fullCoords);
               List<Location> _optimal = [];
               List<List<String>> _optiNames = [];
-              _optimal.add(_routeStore.startLoc);
-              _optiNames.add(_routeStore.startName);
-              _optiRoute.forEach((element) {
-                _optimal.add(_routeStore.coords[element.label]);
-                _optiNames.add(_routeStore.locs[element.label]);
-              });
+              for (int i = 1; i < _optiRoute.length; i++) {
+                _optimal.add(_routeStore.coords[_optiRoute[i].label - 1]);
+                _optiNames.add(_routeStore.locs[_optiRoute[i].label - 1]);
+              }
               _routeStore.locs = ObservableList.of(_optiNames);
               _routeStore.coords = ObservableList.of(_optimal);
             }
+            Navigator.of(context).push(MaterialPageRoute(builder: (_) => NavigationScreen()));
           },
           child: Text(
             'Start Route',
@@ -214,8 +220,8 @@ class _RouteScreenState extends State<RouteScreen> {
                                     List<String>? _locName = _routeStore.locs[index];
                                     Location? _locLocation = _routeStore.coords[index];
                                     if (_routeStore.startName.length > 0) {
-                                      _routeStore.locs[_routeStore.locs.length] = _routeStore.startName;
-                                      _routeStore.coords[_routeStore.coords.length] = _routeStore.startLoc;
+                                      _routeStore.locs.add(_routeStore.startName);
+                                      _routeStore.coords.add(_routeStore.startLoc);
                                     }
                                     var temp = _routeStore.locs.length;
                                     for (int i = index + 1; i < temp; i++) {
@@ -224,8 +230,10 @@ class _RouteScreenState extends State<RouteScreen> {
                                       _routeStore.locs[i - 1] = _locName;
                                       _routeStore.coords[i - 1] = _locLocation;
                                     }
-                                    _routeStore.locs.remove(_routeStore.locs.length - 1);
-                                    _routeStore.coords.remove(_routeStore.locs.length - 1);
+                                    print(_routeStore.locs.length);
+                                    _routeStore.locs.removeAt(_routeStore.locs.length - 1);
+                                    print(_routeStore.coords.length);
+                                    _routeStore.coords.removeAt(_routeStore.coords.length - 1);
                                     _routeStore.startName = ObservableList.of(_locName);
                                     _routeStore.startLoc = _locLocation;
                                   },
@@ -245,7 +253,16 @@ class _RouteScreenState extends State<RouteScreen> {
                                   style: ElevatedButton.styleFrom(
                                     primary: Colors.red,
                                   ),
-                                  onPressed: () {},
+                                  onPressed: () {
+                                    for (int i = index + 1; i < _routeStore.locs.length; i++) {
+                                      List<String> _locName = _routeStore.locs[i];
+                                      Location _locLocation = _routeStore.coords[i];
+                                      _routeStore.locs[i - 1] = _locName;
+                                      _routeStore.coords[i - 1] = _locLocation;
+                                    }
+                                    _routeStore.locs.removeAt(_routeStore.locs.length - 1);
+                                    _routeStore.coords.removeAt(_routeStore.coords.length - 1);
+                                  },
                                   child: Text('Delete Location'),
                                 ),
                               ),
@@ -271,17 +288,19 @@ class _RouteScreenState extends State<RouteScreen> {
                                   Padding(
                                     padding: EdgeInsets.only(left: size.width * 0.02, top: size.height * 0.01),
                                     child: Container(
-                                      width: size.width * 0.68,
+                                      width: size.width * 0.665,
                                       child: Column(
                                         children: [
                                           Container(
                                             width: size.width * 0.8,
                                             height: size.height * 0.03,
                                             child: Observer(
-                                              builder: (_) => Text(
-                                                _routeStore.locs[index][0],
-                                                style: TextStyle(fontSize: 15.0, fontWeight: FontWeight.w500),
-                                              ),
+                                              builder: (_) {
+                                                return Text(
+                                                  _routeStore.locs[index][0],
+                                                  style: TextStyle(fontSize: 15.0, fontWeight: FontWeight.w500),
+                                                );
+                                              },
                                             ),
                                           ),
                                           Container(
@@ -491,33 +510,27 @@ class OverlayView extends StatelessWidget {
               ),
               Container(
                 height: size.height * 0.08,
+                width: size.width * 0.6,
                 child: Observer(
                   builder: (_) {
                     if (_routeStore.curStep == 6) {
-                      widgetOpacity = 12.0;
+                      Future.delayed(Duration(milliseconds: 800), () {
+                        Navigator.pop(context);
+                      });
                     }
-                    return AnimatedOpacity(
-                      duration: Duration(seconds: 1),
-                      opacity: widgetOpacity,
-                      onEnd: () {
-                        if (widgetOpacity == 12.0) {
-                          Future.delayed(Duration(milliseconds: 800), () {
-                            Navigator.of(context).pop();
-                          });
-                        }
-                      },
-                      child: StepProgressIndicator(
-                        totalSteps: 6,
-                        currentStep: _routeStore.curStep,
-                        selectedSize: 12,
-                        unselectedSize: 8,
-                      ),
+                    return StepProgressIndicator(
+                      selectedColor: Colors.blue,
+                      unselectedColor: Colors.grey,
+                      totalSteps: 6,
+                      currentStep: _routeStore.curStep,
+                      selectedSize: 12,
+                      unselectedSize: 8,
                     );
                   },
                 ),
               ),
               Padding(
-                padding: EdgeInsets.only(top: size.height*0.02),
+                padding: EdgeInsets.only(top: size.height * 0.02),
                 child: Container(
                   height: size.height * 0.05,
                   width: size.width * 0.6,
