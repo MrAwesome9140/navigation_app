@@ -31,6 +31,21 @@ mixin _$RouteStore on _RouteStore, Store {
     });
   }
 
+  final _$controllerAtom = Atom(name: '_RouteStore.controller');
+
+  @override
+  PersistentTabController get controller {
+    _$controllerAtom.reportRead();
+    return super.controller;
+  }
+
+  @override
+  set controller(PersistentTabController value) {
+    _$controllerAtom.reportWrite(value, super.controller, () {
+      super.controller = value;
+    });
+  }
+
   final _$locsAtom = Atom(name: '_RouteStore.locs');
 
   @override
@@ -179,6 +194,7 @@ mixin _$RouteStore on _RouteStore, Store {
   String toString() {
     return '''
 homeControlller: ${homeControlller},
+controller: ${controller},
 locs: ${locs},
 coords: ${coords},
 optiRoute: ${optiRoute},
