@@ -12,14 +12,6 @@ class NavigationScreen extends StatefulWidget {
 
 class _NavigationScreenState extends State<NavigationScreen> {
   late MapBoxNavigation _directions;
-  double _distanceRemaining = 0.0;
-  double _durationRemaining = 0.0;
-  bool _arrived = false;
-  String _instruction = "";
-  bool _routeBuilt = false;
-  bool _isNavigating = false;
-  bool _isMultipleStop = false;
-  String _platformVersion = "";
   late final MapBoxNavigationViewController _controller;
   late MapBoxOptions _options;
   RouteStore _routeStore = RouteStore();
@@ -63,10 +55,6 @@ class _NavigationScreenState extends State<NavigationScreen> {
     } on PlatformException {
       platformVersion = 'Failed to get platform version.';
     }
-
-    setState(() {
-      _platformVersion = platformVersion;
-    });
   }
 
   Future<void> _onRouteEvent(e) async {
@@ -123,7 +111,6 @@ class _NavigationScreenState extends State<NavigationScreen> {
             route.add(new WayPoint(name: _routeStore.locs[i][0], latitude: _routeStore.coords[i].latitude, longitude: _routeStore.coords[i].longitude));
           }
           _controller.buildRoute(wayPoints: route);
-          _isMultipleStop = true;
           _controller.startNavigation();
         },
       ),

@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_mapbox_navigation/library.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:navigation_app/Services/location_service.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -20,6 +21,8 @@ class _HomeScreenState extends State<HomeScreen> {
   Completer<GoogleMapController> _controller = Completer();
   late Future<Position> _curLoc;
   RouteStore _routeStore = RouteStore();
+  late MapBoxOptions _options;
+  late MapBoxNavigationViewController _mapCotroller;
 
   static final CameraPosition _kGooglePlex = CameraPosition(
     target: LatLng(37.42796133580664, -122.085749655962),
@@ -29,6 +32,28 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+
+    _options = MapBoxOptions(
+      initialLatitude: _routeStore.curLoc.latitude,
+      initialLongitude: _routeStore.curLoc.longitude,
+      zoom: 16.0,
+      tilt: 0.0,
+      bearing: 0.0,
+      enableRefresh: false,
+      alternatives: true,
+      voiceInstructionsEnabled: true,
+      bannerInstructionsEnabled: true,
+      allowsUTurnAtWayPoints: true,
+      mode: MapBoxNavigationMode.drivingWithTraffic,
+      units: VoiceUnits.imperial,
+      simulateRoute: false,
+      animateBuildRoute: true,
+      longPressDestinationEnabled: false,
+      language: "en",
+      mapStyleUrlDay: "mapbox://styles/mrawesome9104/cks4ya82g0vy217mu0xpmger0",
+      mapStyleUrlNight: "mapbox://styles/mrawesome9104/cks4y93u33j5817nzdxsecpcm",
+      isOptimized: false,
+    );
   }
 
   @override
@@ -37,13 +62,13 @@ class _HomeScreenState extends State<HomeScreen> {
     //   future: _curLoc,
     //   builder: (context, data) {
     //     if (data.hasData) {
-          return Scaffold(
-            body: Stack(
-              children: [
-                Map(),
-              ],
-            ),
-          );
+    return Scaffold(
+      body: Stack(
+        children: [
+          Map(),
+        ],
+      ),
+    );
     //     } else {
     //       return Center(child: CircularProgressIndicator());
     //     }
@@ -54,17 +79,20 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget Map() {
     var pos = _routeStore.curLoc;
     //var loc = data.data as Position;
-    return GoogleMap(
-      onMapCreated: (controller) {
-        _controller.complete(controller);
+    // return GoogleMap(
+    //   onMapCreated: (controller) {
+    //     _controller.complete(controller);
+    //   },
+    //   initialCameraPosition:
+    //       CameraPosition(target: LatLng(pos.latitude, pos.longitude), zoom: 14),
+    // );
+    return MapBoxNavigationView(
+      options: _options,
+      onCreated: (controller) {
+        _routeStore.homeControlller = controller;
+        _routeStore.homeControlller.initialize();
+        debugPrintStack();
       },
-      initialCameraPosition:
-          CameraPosition(target: LatLng(pos.latitude, pos.longitude), zoom: 14),
     );
   }
-
-  // Future<void> _goToCurrentLocation() async {
-  //   final GoogleMapController controller = await _controller.future;
-  //   controller
-  // }
 }

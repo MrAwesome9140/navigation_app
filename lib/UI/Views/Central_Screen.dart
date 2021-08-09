@@ -20,7 +20,7 @@ class CentralScreen extends StatefulWidget {
 }
 
 class _CentralScreenState extends State<CentralScreen> {
-  late PersistentTabController _controller;
+  late PersistentTabController controller;
   late bool _hideNavBar;
   int _curIndex = 0;
   final _locationService = LocationService();
@@ -30,7 +30,7 @@ class _CentralScreenState extends State<CentralScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    _controller = PersistentTabController(initialIndex: 0);
+    controller = PersistentTabController(initialIndex: 0);
     _hideNavBar = false;
   }
 
@@ -115,7 +115,7 @@ class _CentralScreenState extends State<CentralScreen> {
                 floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
                 body: PersistentTabView(
                   context,
-                  controller: _controller,
+                  controller: _routeStore.controller,
                   screens: _buildScreens(),
                   items: _navBarsItems(),
                   confineInSafeArea: true,

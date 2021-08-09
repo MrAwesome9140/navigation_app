@@ -1,9 +1,11 @@
+import 'package:flutter_mapbox_navigation/library.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:mobx/mobx.dart';
 import 'package:navigation_app/Models/graph.dart';
 import 'package:navigation_app/Services/mapbox_service.dart';
 import 'package:flutter/material.dart';
+import 'package:persistent_bottom_nav_bar/persistent-tab-view.dart';
 
 part 'route_store.g.dart';
 
@@ -18,6 +20,12 @@ class RouteStore extends _RouteStore with _$RouteStore {
 }
 
 abstract class _RouteStore with Store {
+  @observable
+  MapBoxNavigationViewController homeControlller = MapBoxNavigationViewController(0, (event) {});
+
+  @observable
+  PersistentTabController controller = PersistentTabController();
+
   @observable
   ObservableList<List<String>> locs = new ObservableList<List<String>>();
 

@@ -16,6 +16,21 @@ mixin _$RouteStore on _RouteStore, Store {
           Computed<int>(() => super.locsLength, name: '_RouteStore.locsLength'))
       .value;
 
+  final _$homeControlllerAtom = Atom(name: '_RouteStore.homeControlller');
+
+  @override
+  MapBoxNavigationViewController get homeControlller {
+    _$homeControlllerAtom.reportRead();
+    return super.homeControlller;
+  }
+
+  @override
+  set homeControlller(MapBoxNavigationViewController value) {
+    _$homeControlllerAtom.reportWrite(value, super.homeControlller, () {
+      super.homeControlller = value;
+    });
+  }
+
   final _$locsAtom = Atom(name: '_RouteStore.locs');
 
   @override
@@ -163,6 +178,7 @@ mixin _$RouteStore on _RouteStore, Store {
   @override
   String toString() {
     return '''
+homeControlller: ${homeControlller},
 locs: ${locs},
 coords: ${coords},
 optiRoute: ${optiRoute},

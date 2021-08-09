@@ -1,6 +1,8 @@
 import 'package:expandable/expandable.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_mapbox_navigation/library.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
@@ -27,11 +29,42 @@ class _RouteScreenState extends State<RouteScreen> {
   bool _switch2State = false;
   RouteStore _routeStore = RouteStore();
   late MapBoxService _mapBoxService;
+  late MapBoxNavigation _directions;
+  late final MapBoxNavigationViewController _controller;
+  late MapBoxOptions _options;
 
   @override
   void initState() {
     super.initState();
     _mapBoxService = MapBoxService(context: context);
+    initialize();
+  }
+
+  Future<void> initialize() async {
+    // If the widget was removed from the tree while the asynchronous platform
+    // message was in flight, we want to discard the reply rather than calling
+    // setState to update our non-existent appearance.
+    if (!mounted) return;
+
+    _directions = MapBoxNavigation();
+    _options = MapBoxOptions(
+      initialLatitude: _routeStore.curLoc.latitude,
+      initialLongitude: _routeStore.curLoc.longitude,
+      zoom: 16.0,
+      tilt: 0.0,
+      bearing: 0.0,
+      enableRefresh: false,
+      alternatives: true,
+      voiceInstructionsEnabled: true,
+      bannerInstructionsEnabled: true,
+      allowsUTurnAtWayPoints: true,
+      mode: MapBoxNavigationMode.drivingWithTraffic,
+      units: VoiceUnits.imperial,
+      simulateRoute: false,
+      animateBuildRoute: true,
+      longPressDestinationEnabled: true,
+      language: "en",
+    );
   }
 
   @override
@@ -158,7 +191,17 @@ class _RouteScreenState extends State<RouteScreen> {
               _routeStore.locs = ObservableList.of(_optiNames);
               _routeStore.coords = ObservableList.of(_optimal);
             }
-            Navigator.of(context).push(MaterialPageRoute(builder: (_) => NavigationScreen()));
+            List<WayPoint> route = [];
+            route.add(new WayPoint(name: _routeStore.startName[0], latitude: _routeStore.startLoc.latitude, longitude: _routeStore.startLoc.longitude));
+            for (int i = 0; i < _routeStore.locs.length; i++) {
+              route.add(new WayPoint(name: _routeStore.locs[i][0], latitude: _routeStore.coords[i].latitude, longitude: _routeStore.coords[i].longitude));
+            }
+            if (_switch2State) {
+              route.add(new WayPoint(name: _routeStore.startName[0], latitude: _routeStore.startLoc.latitude, longitude: _routeStore.startLoc.longitude));
+            }
+            _routeStore.controller.jumpToTab(0);
+            await _routeStore.homeControlller.buildRoute(wayPoints: route);
+            await _routeStore.homeControlller.startNavigation();
           },
           child: Text(
             'Start Route',
