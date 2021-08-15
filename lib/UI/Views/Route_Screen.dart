@@ -70,24 +70,27 @@ class _RouteScreenState extends State<RouteScreen> {
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
-    return Scaffold(
-      body: Stack(
-        children: [
-          Padding(
-            padding: EdgeInsets.only(
-              top: size.height * 0.15,
+    return Container(
+      height: size.height*0.93,
+      child: Scaffold(
+        body: Stack(
+          children: [
+            Padding(
+              padding: EdgeInsets.only(
+                top: size.height * 0.15,
+              ),
+              child: Column(
+                children: [
+                  _routeSettings(size),
+                  _startLocation(size),
+                  _locationsDisplay(size),
+                  _startButton(size),
+                ],
+              ),
             ),
-            child: Column(
-              children: [
-                _routeSettings(size),
-                _startLocation(size),
-                _locationsDisplay(size),
-                _startButton(size),
-              ],
-            ),
-          ),
-          _searchBar(size),
-        ],
+            _searchBar(size),
+          ],
+        ),
       ),
     );
   }

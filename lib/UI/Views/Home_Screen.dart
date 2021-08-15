@@ -58,6 +58,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    var size = MediaQuery.of(context).size;
     // return FutureBuilder(
     //   future: _curLoc,
     //   builder: (context, data) {
@@ -65,7 +66,10 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       body: Stack(
         children: [
-          Map(),
+          Container(
+            height: size.height*0.93,
+            child: Map()
+          ),
         ],
       ),
     );
