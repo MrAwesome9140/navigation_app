@@ -44,7 +44,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
       units: VoiceUnits.imperial,
       simulateRoute: false,
       animateBuildRoute: true,
-      longPressDestinationEnabled: true,
+      longPressDestinationEnabled: false,
       language: "en",
     );
 

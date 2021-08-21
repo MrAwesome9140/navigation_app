@@ -68,7 +68,7 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           Container(
             height: size.height*0.93,
-            child: Map()
+            //child: Map()
           ),
         ],
       ),

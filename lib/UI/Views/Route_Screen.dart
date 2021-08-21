@@ -30,12 +30,30 @@ class _RouteScreenState extends State<RouteScreen> {
   RouteStore _routeStore = RouteStore();
   late MapBoxService _mapBoxService;
   late MapBoxNavigation _directions;
-  late final MapBoxNavigationViewController _controller;
   late MapBoxOptions _options;
 
   @override
   void initState() {
     super.initState();
+    _options = MapBoxOptions(
+      initialLatitude: _routeStore.curLoc.latitude,
+      initialLongitude: _routeStore.curLoc.longitude,
+      zoom: 18.0,
+      tilt: 0.0,
+      bearing: 0.0,
+      enableRefresh: false,
+      alternatives: true,
+      voiceInstructionsEnabled: true,
+      bannerInstructionsEnabled: true,
+      allowsUTurnAtWayPoints: true,
+      mode: MapBoxNavigationMode.drivingWithTraffic,
+      units: VoiceUnits.imperial,
+      simulateRoute: false,
+      animateBuildRoute: true,
+      longPressDestinationEnabled: false,
+      language: "en",
+    );
+    _directions = MapBoxNavigation();
     _mapBoxService = MapBoxService(context: context);
     initialize();
   }
@@ -71,7 +89,7 @@ class _RouteScreenState extends State<RouteScreen> {
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
     return Container(
-      height: size.height*0.93,
+      height: size.height * 0.93,
       child: Scaffold(
         body: Stack(
           children: [
@@ -202,9 +220,7 @@ class _RouteScreenState extends State<RouteScreen> {
             if (_switch2State) {
               route.add(new WayPoint(name: _routeStore.startName[0], latitude: _routeStore.startLoc.latitude, longitude: _routeStore.startLoc.longitude));
             }
-            _routeStore.controller.jumpToTab(0);
-            await _routeStore.homeControlller.buildRoute(wayPoints: route);
-            await _routeStore.homeControlller.startNavigation();
+            await _directions.startNavigation(wayPoints: route, options: _options);
           },
           child: Text(
             'Start Route',

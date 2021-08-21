@@ -71,6 +71,7 @@ class MapBoxService {
   Graph createGraph(http.Response matrix, Graph myGraph) {
     http.Response first = matrix;
     List<SpecialVertex> verts = myGraph.vertices;
+    print(first.body);
     var initData = json.decode(first.body);
     var initDurations = initData["durations"] as List<dynamic>;
     var nums = List<List<bool>>.generate(verts.length, (i) => List.generate(verts.length, (_) => false), growable: false);
@@ -94,13 +95,16 @@ class MapBoxService {
     for (int i = 0; i < coords.length; i++) {
       myGraph.addVertex(new SpecialVertex(label: i));
     }
-    final String _baseOSRM = "router.project-osrm.org";
-    StringBuffer _extension = new StringBuffer("/table/v1/driving/");
+    final String _baseMapBox = "api.mapbox.com";
+    StringBuffer _extension = new StringBuffer("/directions-matrix/v1/mapbox/driving/");
     coords.forEach((element) {
       _extension.write("${element.longitude},${element.latitude};");
     });
 
-    var response = await http.get(Uri.http(_baseOSRM, _extension.toString().substring(0, _extension.length - 1)));
+    Map<String, String> _params = new Map();
+    _params["access_token"] = _mapBoxKey;
+
+    var response = await http.get(Uri.https(_baseMapBox, _extension.toString().substring(0, _extension.length - 1), _params));
     return createGraph(response, myGraph);
   }
 
