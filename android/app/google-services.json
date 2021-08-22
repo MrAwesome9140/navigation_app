@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "258303659499",
+    "project_id": "optirouter-75d1f",
+    "storage_bucket": "optirouter-75d1f.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:258303659499:android:73623f03d62713d0d01dae",
+        "android_client_info": {
+          "package_name": "com.example.navigation_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "258303659499-cjoijfn7kif3mttpmr3c0f51bdjkkvgj.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.navigation_app",
+            "certificate_hash": "b1059a222455a8f15af51622d86005c35e8001f5"
+          }
+        },
+        {
+          "client_id": "258303659499-rbm4152i7qhe1oo32dek8ibc4staqlsl.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAYs-WMBvee3OT-m-Hoom_VC0w-F0XAVNk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "258303659499-rbm4152i7qhe1oo32dek8ibc4staqlsl.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

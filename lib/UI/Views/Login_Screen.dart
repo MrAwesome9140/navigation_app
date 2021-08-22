@@ -1,5 +1,8 @@
+import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
+import 'package:navigation_app/Services/auth_service.dart';
 import 'package:navigation_app/UI/Views/Central_Screen.dart';
+import 'package:provider/provider.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -108,7 +111,9 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                     onPressed: () {
-                      Navigator.of(context).push(MaterialPageRoute(builder: (_) => CentralScreen()));
+                      if (EmailValidator.validate(_tempUName)) {
+                        context.read<AuthService>().signIn(email: _tempUName.trim(), password: _tempPass.trim());
+                      }
                     },
                   ),
                 ),
