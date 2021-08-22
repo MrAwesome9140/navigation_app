@@ -3,6 +3,8 @@ import 'package:navigation_app/UI/Views/Central_Screen.dart';
 import 'package:navigation_app/UI/Views/Home_Screen.dart';
 import 'package:flutter/services.dart';
 
+import 'UI/Views/Login_Screen.dart';
+
 void main() {
   runApp(MyApp());
 }
@@ -14,7 +16,7 @@ class MyApp extends StatelessWidget {
       DeviceOrientation.portraitUp,
     ]);
     return MaterialApp(
-      home: CentralScreen(),
+      home: LoginScreen(),
       theme: ThemeData(
         fontFamily: 'Gelasio',
       ),
