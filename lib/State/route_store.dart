@@ -50,6 +50,9 @@ abstract class _RouteStore with Store {
   @observable
   var curStep = 0;
 
+  @observable
+  var loggedIn = false;
+
   @action
   void flipOverlay() {
     progressOverlay = !progressOverlay;

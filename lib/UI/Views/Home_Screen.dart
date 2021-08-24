@@ -59,44 +59,34 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
-    // return FutureBuilder(
-    //   future: _curLoc,
-    //   builder: (context, data) {
-    //     if (data.hasData) {
     return Scaffold(
       body: Stack(
         children: [
           Container(
-            height: size.height*0.93,
-            //child: Map()
+            height: size.height * 0.93,
+            child: Map(),
           ),
         ],
       ),
     );
-    //     } else {
-    //       return Center(child: CircularProgressIndicator());
-    //     }
-    //   },
-    // );
   }
 
   Widget Map() {
     var pos = _routeStore.curLoc;
     //var loc = data.data as Position;
-    // return GoogleMap(
-    //   onMapCreated: (controller) {
-    //     _controller.complete(controller);
-    //   },
-    //   initialCameraPosition:
-    //       CameraPosition(target: LatLng(pos.latitude, pos.longitude), zoom: 14),
-    // );
-    return MapBoxNavigationView(
-      options: _options,
-      onCreated: (controller) {
-        _routeStore.homeControlller = controller;
-        _routeStore.homeControlller.initialize();
-        debugPrintStack();
+    return GoogleMap(
+      onMapCreated: (controller) {
+        _controller.complete(controller);
       },
+      initialCameraPosition: CameraPosition(target: LatLng(pos.latitude, pos.longitude), zoom: 14),
     );
+    // return MapBoxNavigationView(
+    //   options: _options,
+    //   onCreated: (controller) {
+    //     _routeStore.homeControlller = controller;
+    //     _routeStore.homeControlller.initialize();
+    //     debugPrintStack();
+    //   },
+    // );
   }
 }

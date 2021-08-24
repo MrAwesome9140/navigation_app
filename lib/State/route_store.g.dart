@@ -151,6 +151,21 @@ mixin _$RouteStore on _RouteStore, Store {
     });
   }
 
+  final _$loggedInAtom = Atom(name: '_RouteStore.loggedIn');
+
+  @override
+  bool get loggedIn {
+    _$loggedInAtom.reportRead();
+    return super.loggedIn;
+  }
+
+  @override
+  set loggedIn(bool value) {
+    _$loggedInAtom.reportWrite(value, super.loggedIn, () {
+      super.loggedIn = value;
+    });
+  }
+
   final _$curLocAtom = Atom(name: '_RouteStore.curLoc');
 
   @override
@@ -202,6 +217,7 @@ startLoc: ${startLoc},
 startName: ${startName},
 progressOverlay: ${progressOverlay},
 curStep: ${curStep},
+loggedIn: ${loggedIn},
 curLoc: ${curLoc},
 locsLength: ${locsLength}
     ''';

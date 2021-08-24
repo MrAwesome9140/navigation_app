@@ -214,13 +214,58 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 Duration(seconds: 2),
                                 () {
                                   Navigator.of(context).pop();
-                                  Navigator.of(context).pop();
-                                  Navigator.of(context).pop();
-                                  Navigator.of(context).push(MaterialPageRoute(builder: (_) => CentralScreen()));
                                 },
                               ),
                             );
-                          } else {}
+                          } else {
+                            Future(
+                              () {
+                                showGeneralDialog(
+                                  context: context,
+                                  pageBuilder: (_, __, ___) {
+                                    return Material(
+                                      type: MaterialType.transparency,
+                                      child: Center(
+                                        child: Container(
+                                          color: Colors.white,
+                                          height: size.height * 0.25,
+                                          width: size.width * 0.7,
+                                          child: Column(
+                                            children: [
+                                              Padding(
+                                                padding: EdgeInsets.only(top: size.height * 0.04),
+                                                child: Center(
+                                                  child: Container(
+                                                    height: size.height * 0.15,
+                                                    width: size.width * 0.6,
+                                                    child: Center(
+                                                      child: Text(
+                                                        "Registration failed. Please try again.",
+                                                        style: TextStyle(
+                                                          fontSize: 16.0,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                );
+                              },
+                            ).then(
+                              (value) => Future.delayed(
+                                Duration(seconds: 2),
+                                () {
+                                  Navigator.of(context).pop();
+                                },
+                              ),
+                            );
+                          }
                         }
                       },
                     ),

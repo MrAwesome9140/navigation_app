@@ -32,7 +32,7 @@ class MyApp extends StatelessWidget {
         ),
       ],
       child: MaterialApp(
-        home: LoginScreen(),
+        home: CentralScreen(),
         theme: ThemeData(
           fontFamily: 'Gelasio',
         ),
