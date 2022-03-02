@@ -168,11 +168,11 @@ class _LoginScreenState extends State<LoginScreen> {
                                                 Padding(
                                                   padding: EdgeInsets.only(top: size.height * 0.015),
                                                   child: Container(
-                                                    height: size.height*0.05,
-                                                    width: size.width*0.5,
+                                                    height: size.height * 0.05,
+                                                    width: size.width * 0.5,
                                                     child: ElevatedButton(
                                                       onPressed: () {
-                                                        Navigator.of(context).pop();
+                                                        Navigator.of(context, rootNavigator: true).pop();
                                                       },
                                                       child: Text('Close'),
                                                     ),

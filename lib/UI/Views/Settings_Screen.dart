@@ -175,46 +175,46 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
         ),
       ),
-      Container(
-        width: size.width * 1,
-        child: Divider(
-          thickness: 1.0,
-          color: Colors.black,
-        ),
-      ),
-      GestureDetector(
-        onTap: () {
-          Navigator.of(context).push(MaterialPageRoute(builder: (_) => RegisterScreen()));
-        },
-        child: Container(
-          height: size.height * 0.04,
-          child: Row(
-            children: [
-              Padding(
-                padding: EdgeInsets.only(left: size.width * 0.05),
-                child: Container(
-                  width: size.width * 0.8,
-                  child: Text('Register'),
-                ),
-              ),
-              Padding(
-                padding: EdgeInsets.only(),
-                child: Container(
-                  width: size.width * 0.1,
-                  child: Icon(Icons.arrow_forward),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-      Container(
-        width: size.width * 1,
-        child: Divider(
-          thickness: 1.0,
-          color: Colors.black,
-        ),
-      ),
+      // Container(
+      //   width: size.width * 1,
+      //   child: Divider(
+      //     thickness: 1.0,
+      //     color: Colors.black,
+      //   ),
+      // ),
+      // GestureDetector(
+      //   onTap: () {
+      //     Navigator.of(context).push(MaterialPageRoute(builder: (_) => RegisterScreen()));
+      //   },
+      //   child: Container(
+      //     height: size.height * 0.04,
+      //     child: Row(
+      //       children: [
+      //         Padding(
+      //           padding: EdgeInsets.only(left: size.width * 0.05),
+      //           child: Container(
+      //             width: size.width * 0.8,
+      //             child: Text('Register'),
+      //           ),
+      //         ),
+      //         Padding(
+      //           padding: EdgeInsets.only(),
+      //           child: Container(
+      //             width: size.width * 0.1,
+      //             child: Icon(Icons.arrow_forward),
+      //           ),
+      //         ),
+      //       ],
+      //     ),
+      //   ),
+      // ),
+      // Container(
+      //   width: size.width * 1,
+      //   child: Divider(
+      //     thickness: 1.0,
+      //     color: Colors.black,
+      //   ),
+      // ),
     ];
   }
 }
