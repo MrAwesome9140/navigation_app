@@ -27,7 +27,7 @@ dependencies:
   flutter_mobx: ^2.0.2
   mobx: ^2.0.4
   geocoding: ^2.0.0
-  geolocator: ^7.4.0
+  geolocator: ^8.0.5
   http: ^0.13.3
   mapbox_search: ^3.0.0-nullsafety.0
   google_maps_flutter: ^2.0.6
@@ -45,10 +45,10 @@ dependencies:
   expansion_tile_card: ^2.0.0
   firebase_core: ^1.5.0
   firebase_auth: ^3.0.2
-  cloud_firestore: ^2.5.0
+  cloud_firestore: ^3.1.9
   provider: ^6.0.0
   email_validator: ^2.0.1
-  settings_ui: ^1.0.0
+  settings_ui: ^2.0.2
 
 dev_dependencies:
   flutter_test:
