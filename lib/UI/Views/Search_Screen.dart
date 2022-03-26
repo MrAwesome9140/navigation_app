@@ -26,7 +26,8 @@ class _SearchScreenState extends State<SearchScreen> {
   bool _locationVis = false;
   String _locName = "";
   String _locAdress = "";
-  Location _locLocation = Location(latitude: 0.0, longitude: 0.0, timestamp: DateTime.now());
+  Location _locLocation =
+      Location(latitude: 0.0, longitude: 0.0, timestamp: DateTime.now());
   Set<Marker> _markers = new Set();
   late GoogleMapController _mapController;
   bool _setStart = false;
@@ -45,41 +46,39 @@ class _SearchScreenState extends State<SearchScreen> {
       body: Stack(
         children: [
           _locationDisplay(),
-          Hero(
-            tag: 'SearchBar',
-            child: Padding(
-              padding: EdgeInsets.only(top: size.height * 0.03),
-              // child: searchBarUI()
-              child: FloatingSearchBar(
-                elevation: 4.0,
-                openAxisAlignment: 0.0,
-                controller: _controller,
-                hint: 'Add Locations...',
-                scrollPadding: EdgeInsets.only(top: 16, bottom: 20),
-                transitionDuration: const Duration(milliseconds: 800),
-                transitionCurve: Curves.easeInOut,
-                transition: CircularFloatingSearchBarTransition(),
-                physics: BouncingScrollPhysics(),
-                height: size.height * 0.06,
-                width: size.width * 0.85,
-                debounceDelay: const Duration(milliseconds: 500),
-                onQueryChanged: (query) {
+          Padding(
+            padding: EdgeInsets.only(top: size.height * 0.03),
+            // child: searchBarUI()
+            child: FloatingSearchBar(
+              automaticallyImplyBackButton: true,
+              elevation: 4.0,
+              openAxisAlignment: 0.0,
+              controller: _controller,
+              hint: 'Add Locations...',
+              scrollPadding: EdgeInsets.only(top: 16, bottom: 20),
+              transitionDuration: const Duration(milliseconds: 800),
+              transitionCurve: Curves.easeInOut,
+              transition: CircularFloatingSearchBarTransition(),
+              physics: BouncingScrollPhysics(),
+              height: size.height * 0.06,
+              width: size.width * 0.8,
+              debounceDelay: const Duration(milliseconds: 500),
+              onQueryChanged: (query) {
+                setState(() {
+                  _autoText = query;
+                });
+              },
+              onFocusChanged: (focus) {
+                if (focus) {
                   setState(() {
-                    _autoText = query;
+                    _locationVis = false;
+                    _setStart = false;
                   });
-                },
-                onFocusChanged: (focus) {
-                  if (focus) {
-                    setState(() {
-                      _locationVis = false;
-                      _setStart = false;
-                    });
-                  }
-                },
-                builder: (context, transition) {
-                  return _autoCompleteOptions();
-                },
-              ),
+                }
+              },
+              builder: (context, transition) {
+                return _autoCompleteOptions();
+              },
             ),
           ),
         ],
@@ -107,7 +106,8 @@ class _SearchScreenState extends State<SearchScreen> {
                       _mapController = controller;
                     },
                     initialCameraPosition: CameraPosition(
-                      target: LatLng(_locLocation.latitude, _locLocation.longitude),
+                      target:
+                          LatLng(_locLocation.latitude, _locLocation.longitude),
                       zoom: 12.0,
                     ),
                     markers: _markers,
@@ -139,7 +139,8 @@ class _SearchScreenState extends State<SearchScreen> {
                               ),
                             ),
                             subtitle: Padding(
-                              padding: EdgeInsets.only(top: size.height * 0.014),
+                              padding:
+                                  EdgeInsets.only(top: size.height * 0.014),
                               child: Container(
                                 child: Text(_locAdress),
                                 decoration: BoxDecoration(
@@ -160,7 +161,9 @@ class _SearchScreenState extends State<SearchScreen> {
                         Row(
                           children: [
                             Padding(
-                              padding: EdgeInsets.only(right: size.width * 0.1, left: size.width * 0.08),
+                              padding: EdgeInsets.only(
+                                  right: size.width * 0.1,
+                                  left: size.width * 0.08),
                               child: Text(
                                 'Start Location',
                                 style: TextStyle(fontSize: 16.0),
@@ -169,7 +172,8 @@ class _SearchScreenState extends State<SearchScreen> {
                             Padding(
                               padding: EdgeInsets.only(),
                               child: Checkbox(
-                                materialTapTargetSize: MaterialTapTargetSize.padded,
+                                materialTapTargetSize:
+                                    MaterialTapTargetSize.padded,
                                 value: _setStart,
                                 onChanged: (val) {
                                   setState(() {
@@ -198,10 +202,13 @@ class _SearchScreenState extends State<SearchScreen> {
                                 } else {
                                   if (_setStart) {
                                     if (_routeStore.startName.length > 0) {
-                                      _routeStore.locs.add(_routeStore.startName);
-                                      _routeStore.coords.add(_routeStore.startLoc);
+                                      _routeStore.locs
+                                          .add(_routeStore.startName);
+                                      _routeStore.coords
+                                          .add(_routeStore.startLoc);
                                     }
-                                    _routeStore.startName = ObservableList.of([_locName, _locAdress]);
+                                    _routeStore.startName = ObservableList.of(
+                                        [_locName, _locAdress]);
                                     _routeStore.startLoc = _locLocation;
                                   } else {
                                     _routeStore.locs.add([
@@ -223,10 +230,13 @@ class _SearchScreenState extends State<SearchScreen> {
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
                                     Padding(
-                                      padding: EdgeInsets.only(right: size.width * 0.03),
+                                      padding: EdgeInsets.only(
+                                          right: size.width * 0.03),
                                       child: Text(
                                         'Add Stop',
-                                        style: TextStyle(fontSize: 24.0, fontWeight: FontWeight.w600),
+                                        style: TextStyle(
+                                            fontSize: 24.0,
+                                            fontWeight: FontWeight.w600),
                                       ),
                                     ),
                                     Icon(
@@ -258,7 +268,8 @@ class _SearchScreenState extends State<SearchScreen> {
         test = false;
       }
     });
-    if (_routeStore.startName.length > 1 && _routeStore.startName[1] == address) test = false;
+    if (_routeStore.startName.length > 1 && _routeStore.startName[1] == address)
+      test = false;
     return test;
   }
 
@@ -272,7 +283,8 @@ class _SearchScreenState extends State<SearchScreen> {
 
     AlertDialog alert = AlertDialog(
       title: Text('Invalid Input'),
-      content: Text('The address you have entered has already been added to your route. Please choose a different stop.'),
+      content: Text(
+          'The address you have entered has already been added to your route. Please choose a different stop.'),
       actions: [
         exitButton,
       ],
@@ -293,7 +305,17 @@ class _SearchScreenState extends State<SearchScreen> {
           return _tempSkeletonOptions(size);
         } else {
           return FutureBuilder(
-            future: _mapService.getSearchResults(_autoText, Position(accuracy: 0.0, altitude: 0.0, heading: 0.0, latitude: _routeStore.curLoc.latitude, longitude: _routeStore.curLoc.longitude, speed: 0.0, speedAccuracy: 0.0, timestamp: null)),
+            future: _mapService.getSearchResults(
+                _autoText,
+                Position(
+                    accuracy: 0.0,
+                    altitude: 0.0,
+                    heading: 0.0,
+                    latitude: _routeStore.curLoc.latitude,
+                    longitude: _routeStore.curLoc.longitude,
+                    speed: 0.0,
+                    speedAccuracy: 0.0,
+                    timestamp: null)),
             builder: (context, snapshot) {
               if (snapshot.hasData && snapshot.data != null) {
                 var suggestions = snapshot.data as List<List<String>>;
@@ -308,7 +330,10 @@ class _SearchScreenState extends State<SearchScreen> {
                           children: [
                             InkWell(
                               onTap: () async {
-                                List<Location> locations = await locationFromAddress(suggestions[1][index], localeIdentifier: "en_US");
+                                List<Location> locations =
+                                    await locationFromAddress(
+                                        suggestions[1][index],
+                                        localeIdentifier: "en_US");
                                 _locName = suggestions[0][index];
                                 _locAdress = suggestions[1][index];
                                 _locLocation = locations.first;
@@ -317,8 +342,11 @@ class _SearchScreenState extends State<SearchScreen> {
                                   _markers.add(
                                     Marker(
                                       markerId: MarkerId("Marker"),
-                                      position: LatLng(_locLocation.latitude, _locLocation.longitude),
-                                      icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
+                                      position: LatLng(_locLocation.latitude,
+                                          _locLocation.longitude),
+                                      icon:
+                                          BitmapDescriptor.defaultMarkerWithHue(
+                                              BitmapDescriptor.hueBlue),
                                     ),
                                   );
                                   _locationVis = true;
@@ -332,7 +360,8 @@ class _SearchScreenState extends State<SearchScreen> {
                                 child: ListTile(
                                   leading: Icon(Icons.location_pin),
                                   title: Padding(
-                                    padding: EdgeInsets.only(top: size.height * 0.01),
+                                    padding: EdgeInsets.only(
+                                        top: size.height * 0.01),
                                     child: Container(
                                       child: Text(suggestions[0][index]),
                                       height: size.height * 0.022,
@@ -343,7 +372,8 @@ class _SearchScreenState extends State<SearchScreen> {
                                     ),
                                   ),
                                   subtitle: Padding(
-                                    padding: EdgeInsets.only(top: size.height * 0.014),
+                                    padding: EdgeInsets.only(
+                                        top: size.height * 0.014),
                                     child: Container(
                                       child: Text(suggestions[1][index]),
                                       decoration: BoxDecoration(
