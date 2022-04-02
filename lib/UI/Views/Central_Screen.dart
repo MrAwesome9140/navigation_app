@@ -123,7 +123,7 @@ class _CentralScreenState extends State<CentralScreen> {
                   handleAndroidBackButtonPress: true,
                   resizeToAvoidBottomInset: true,
                   stateManagement: true,
-                  navBarHeight: size.height * 0.07,
+                  navBarHeight: size.height * 0.09,
                   hideNavigationBarWhenKeyboardShows: true,
                   margin: EdgeInsets.all(0.0),
                   bottomScreenMargin: 0.0,
