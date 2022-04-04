@@ -57,7 +57,7 @@ class _RouteScreenState extends State<RouteScreen> {
     _options = MapBoxOptions(
       initialLatitude: _routeStore.curLoc.latitude,
       initialLongitude: _routeStore.curLoc.longitude,
-      zoom: 16.0,
+      zoom: 20.0,
       tilt: 0.0,
       bearing: 0.0,
       enableRefresh: false,
@@ -69,53 +69,51 @@ class _RouteScreenState extends State<RouteScreen> {
       units: VoiceUnits.imperial,
       simulateRoute: false,
       animateBuildRoute: true,
-      longPressDestinationEnabled: true,
+      longPressDestinationEnabled: false,
       language: "en",
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    var size = MediaQuery.of(context).size;
-    var temp = MediaQuery.of(context).size.height -
-        (MediaQuery.of(context).padding.bottom +
-            MediaQuery.of(context).padding.top);
+    var temp = MediaQuery.of(context).size.height - (MediaQuery.of(context).padding.bottom + MediaQuery.of(context).padding.top);
     _height = temp - temp * 0.09;
+    var size = Size(MediaQuery.of(context).size.width, _height);
     return SafeArea(
       child: Scaffold(
         body: Container(
-          height: _height * 1,
+          height: _height,
           child: Column(
             children: [
-              // Stack(
-              //   children: [
-              //     Padding(
-              //       padding: EdgeInsets.only(
-              //         top: size.height * 0,
-              //       ),
-              //       child: Column(
-              //         children: [
-              //           _searchBar(size),
-              //           _routeSettings(size),
-              //           _startLocation(size),
-              //           _locationsDisplay(size),
-              //           _startButton(size),
-              //         ],
-              //       ),
-              //     ),
-              //   ],
+              Stack(
+                children: [
+                  Padding(
+                    padding: EdgeInsets.only(
+                      top: size.height * 0,
+                    ),
+                    child: Column(
+                      children: [
+                        _searchBar(size),
+                        _routeSettings(size),
+                        _startLocation(size),
+                        _locationsDisplay(size),
+                        _startButton(size),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              // SizedBox(
+              //   height: _height * 0.94,
               // ),
-              SizedBox(
-                height: _height * 0.94,
-              ),
-              Container(
-                color: Colors.pink,
-                height: _height * 0.05,
-              ),
-              Container(
-                color: Colors.black,
-                height: _height * 0.01,
-              ),
+              // Container(
+              //   color: Colors.pink,
+              //   height: _height * 0.05,
+              // ),
+              // Container(
+              //   color: Colors.black,
+              //   height: _height * 0.01,
+              // ),
             ],
           ),
         ),
@@ -125,7 +123,7 @@ class _RouteScreenState extends State<RouteScreen> {
 
   Widget _startLocation(Size size) {
     return Container(
-      height: size.height * 0.16,
+      height: size.height * 0.19,
       width: size.width * 0.9,
       color: Colors.transparent,
       child: Column(
@@ -141,55 +139,53 @@ class _RouteScreenState extends State<RouteScreen> {
               ),
             ),
           ),
-          Container(
-            height: size.height * 0.07,
-            decoration: BoxDecoration(
-                border: Border.all(color: Colors.black, width: 2.0)),
-            child: Row(
-              children: [
-                Container(
-                  width: size.width * 0.15,
-                  child: Center(child: Icon(Icons.location_pin)),
-                ),
-                Container(
-                  width: size.width * 0.68,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        child: Padding(
-                          padding: EdgeInsets.only(top: size.height * 0.01),
-                          child: Observer(
-                            builder: (_) => Text(
-                              _routeStore.startName.length != 0
-                                  ? _routeStore.startName[0]
-                                  : "",
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                fontSize: 16.0,
-                                fontWeight: FontWeight.bold,
+          Padding(
+            padding: EdgeInsets.only(top: size.height * 0.01),
+            child: Container(
+              height: size.height * 0.09,
+              decoration: BoxDecoration(border: Border.all(color: Colors.black, width: 2.0)),
+              child: Row(
+                children: [
+                  Container(
+                    width: size.width * 0.15,
+                    child: Center(child: Icon(Icons.location_pin)),
+                  ),
+                  Container(
+                    width: size.width * 0.68,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: Padding(
+                            padding: EdgeInsets.only(top: size.height * 0.01),
+                            child: Observer(
+                              builder: (_) => Text(
+                                _routeStore.startName.length != 0 ? _routeStore.startName[0] : "",
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  fontSize: 16.0,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                             ),
                           ),
                         ),
-                      ),
-                      Expanded(
-                        child: Padding(
-                          padding: EdgeInsets.only(top: size.height * 0.0045),
-                          child: Observer(
-                            builder: (_) => Text(
-                              _routeStore.startName.length != 0
-                                  ? _routeStore.startName[1]
-                                  : "",
-                              overflow: TextOverflow.ellipsis,
+                        Expanded(
+                          child: Padding(
+                            padding: EdgeInsets.only(top: size.height * 0.0045),
+                            child: Observer(
+                              builder: (_) => Text(
+                                _routeStore.startName.length != 0 ? _routeStore.startName[1] : "",
+                                overflow: TextOverflow.ellipsis,
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                )
-              ],
+                      ],
+                    ),
+                  )
+                ],
+              ),
             ),
           ),
         ],
@@ -205,8 +201,7 @@ class _RouteScreenState extends State<RouteScreen> {
         width: size.width,
         color: Colors.transparent,
         child: ElevatedButton(
-          style: ButtonStyle(
-              backgroundColor: MaterialStateProperty.all(Colors.green[200])),
+          style: ButtonStyle(backgroundColor: MaterialStateProperty.all(Colors.green[200])),
           onPressed: () async {
             if (_switch1State) {
               _routeStore.curStep = 0;
@@ -222,8 +217,7 @@ class _RouteScreenState extends State<RouteScreen> {
               );
               List<Location> _fullCoords = [_routeStore.startLoc];
               _fullCoords.addAll(_routeStore.coords);
-              List<SpecialVertex> _optiRoute =
-                  await _mapBoxService.getOptimalPath(_fullCoords);
+              List<SpecialVertex> _optiRoute = await _mapBoxService.getOptimalPath(_fullCoords);
               List<Location> _optimal = [];
               List<List<String>> _optiNames = [];
               for (int i = 1; i < _optiRoute.length; i++) {
@@ -234,24 +228,14 @@ class _RouteScreenState extends State<RouteScreen> {
               _routeStore.coords = ObservableList.of(_optimal);
             }
             List<WayPoint> route = [];
-            route.add(new WayPoint(
-                name: _routeStore.startName[0],
-                latitude: _routeStore.startLoc.latitude,
-                longitude: _routeStore.startLoc.longitude));
+            route.add(new WayPoint(name: _routeStore.startName[0], latitude: _routeStore.startLoc.latitude, longitude: _routeStore.startLoc.longitude));
             for (int i = 0; i < _routeStore.locs.length; i++) {
-              route.add(new WayPoint(
-                  name: _routeStore.locs[i][0],
-                  latitude: _routeStore.coords[i].latitude,
-                  longitude: _routeStore.coords[i].longitude));
+              route.add(new WayPoint(name: _routeStore.locs[i][0], latitude: _routeStore.coords[i].latitude, longitude: _routeStore.coords[i].longitude));
             }
             if (_switch2State) {
-              route.add(new WayPoint(
-                  name: _routeStore.startName[0],
-                  latitude: _routeStore.startLoc.latitude,
-                  longitude: _routeStore.startLoc.longitude));
+              route.add(new WayPoint(name: _routeStore.startName[0], latitude: _routeStore.startLoc.latitude, longitude: _routeStore.startLoc.longitude));
             }
-            await _directions.startNavigation(
-                wayPoints: route, options: _options);
+            await _directions.startNavigation(wayPoints: route, options: _options);
           },
           child: Text(
             'Start Route',
@@ -263,11 +247,11 @@ class _RouteScreenState extends State<RouteScreen> {
   }
 
   Widget _locationsDisplay(Size size) {
-    return Column(
-      children: [
-        Padding(
-          padding: EdgeInsets.only(top: size.height * 0.03),
-          child: SizedBox(
+    return Padding(
+      padding: EdgeInsets.only(top: size.height * 0.03),
+      child: Column(
+        children: [
+          SizedBox(
             height: size.height * 0.06,
             width: size.width * 0.85,
             child: Text(
@@ -275,189 +259,167 @@ class _RouteScreenState extends State<RouteScreen> {
               style: TextStyle(fontSize: 30.0, fontWeight: FontWeight.w600),
             ),
           ),
-        ),
-        Padding(
-          padding: EdgeInsets.only(),
-          child: Container(
-            decoration: BoxDecoration(color: Colors.blue[100]),
-            height: size.height * 0.2,
-            child: Observer(
-              builder: (_) => ReorderableListView.builder(
-                scrollController: ScrollController(initialScrollOffset: 12),
-                onReorder: (int oldIndex, int newIndex) {
-                  List<String> tempPos = _routeStore.locs[oldIndex];
-                  Location tempLoc = _routeStore.coords[oldIndex];
-                  _routeStore.locs[oldIndex] = _routeStore.locs[newIndex];
-                  _routeStore.coords[oldIndex] = _routeStore.coords[newIndex];
-                  _routeStore.locs[newIndex] = tempPos;
-                  _routeStore.coords[newIndex] = tempLoc;
-                },
-                itemCount: _routeStore.locs.length,
-                itemBuilder: (context, index) {
-                  return Padding(
-                    key: Key(index.toString()),
-                    padding: EdgeInsets
-                        .only(), //EdgeInsets.only(top: size.height * 0.005, bottom: size.height * 0.005),
-                    child: Container(
-                      color: Colors.blue[100],
-                      child: ExpansionTile(
-                        children: [
-                          Padding(
-                            padding: EdgeInsets.only(),
-                            child: Container(
-                              height: size.height * 0.05,
-                              width: size.width * 0.9,
-                              child: Align(
-                                alignment: Alignment.center,
-                                child: ElevatedButton(
-                                  onPressed: () {
-                                    List<String>? _locName =
-                                        _routeStore.locs[index];
-                                    Location? _locLocation =
-                                        _routeStore.coords[index];
-                                    if (_routeStore.startName.length > 0) {
-                                      _routeStore.locs
-                                          .add(_routeStore.startName);
-                                      _routeStore.coords
-                                          .add(_routeStore.startLoc);
-                                    }
-                                    var temp = _routeStore.locs.length;
-                                    for (int i = index + 1; i < temp; i++) {
-                                      List<String> _locName =
-                                          _routeStore.locs[i];
-                                      Location _locLocation =
-                                          _routeStore.coords[i];
-                                      _routeStore.locs[i - 1] = _locName;
-                                      _routeStore.coords[i - 1] = _locLocation;
-                                    }
-                                    print(_routeStore.locs.length);
-                                    _routeStore.locs
-                                        .removeAt(_routeStore.locs.length - 1);
-                                    print(_routeStore.coords.length);
-                                    _routeStore.coords.removeAt(
-                                        _routeStore.coords.length - 1);
-                                    _routeStore.startName =
-                                        ObservableList.of(_locName);
-                                    _routeStore.startLoc = _locLocation;
-                                  },
-                                  child: Text('Set as Start Location'),
-                                ),
-                              ),
-                            ),
-                          ),
-                          Padding(
-                            padding: EdgeInsets.only(),
-                            child: Container(
-                              height: size.height * 0.05,
-                              width: size.width * 0.9,
-                              child: Align(
-                                alignment: Alignment.center,
-                                child: ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                    primary: Colors.red,
-                                  ),
-                                  onPressed: () {
-                                    for (int i = index + 1;
-                                        i < _routeStore.locs.length;
-                                        i++) {
-                                      List<String> _locName =
-                                          _routeStore.locs[i];
-                                      Location _locLocation =
-                                          _routeStore.coords[i];
-                                      _routeStore.locs[i - 1] = _locName;
-                                      _routeStore.coords[i - 1] = _locLocation;
-                                    }
-                                    _routeStore.locs
-                                        .removeAt(_routeStore.locs.length - 1);
-                                    _routeStore.coords.removeAt(
-                                        _routeStore.coords.length - 1);
-                                  },
-                                  child: Text('Delete Location'),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                        title: Column(
+          Padding(
+            padding: EdgeInsets.only(),
+            child: Container(
+              decoration: BoxDecoration(color: Colors.blue[100]),
+              height: size.height * 0.27,
+              child: Observer(
+                builder: (_) => ReorderableListView.builder(
+                  scrollController: ScrollController(initialScrollOffset: 12),
+                  onReorder: (int oldIndex, int newIndex) {
+                    List<String> tempPos = _routeStore.locs[oldIndex];
+                    Location tempLoc = _routeStore.coords[oldIndex];
+                    _routeStore.locs[oldIndex] = _routeStore.locs[newIndex];
+                    _routeStore.coords[oldIndex] = _routeStore.coords[newIndex];
+                    _routeStore.locs[newIndex] = tempPos;
+                    _routeStore.coords[newIndex] = tempLoc;
+                  },
+                  itemCount: _routeStore.locs.length,
+                  itemBuilder: (context, index) {
+                    return Padding(
+                      key: Key(index.toString()),
+                      padding: EdgeInsets.only(), //EdgeInsets.only(top: size.height * 0.005, bottom: size.height * 0.005),
+                      child: Container(
+                        color: Colors.blue[100],
+                        child: ExpansionTile(
                           children: [
-                            SizedBox(
-                              height: index == 0 ? size.height * 0.006 : 0,
-                            ),
-                            Container(
-                              height: size.height * 0.08,
-                              child: Row(
-                                children: [
-                                  Container(
-                                    width: size.width * 0.1,
-                                    child: Padding(
-                                      padding: EdgeInsets.only(
-                                          bottom: size.height * 0.015),
-                                      child: Icon(Icons.location_pin),
-                                    ),
+                            Padding(
+                              padding: EdgeInsets.only(),
+                              child: Container(
+                                height: size.height * 0.05,
+                                width: size.width * 0.9,
+                                child: Align(
+                                  alignment: Alignment.center,
+                                  child: ElevatedButton(
+                                    onPressed: () {
+                                      List<String>? _locName = _routeStore.locs[index];
+                                      Location? _locLocation = _routeStore.coords[index];
+                                      if (_routeStore.startName.length > 0) {
+                                        _routeStore.locs.add(_routeStore.startName);
+                                        _routeStore.coords.add(_routeStore.startLoc);
+                                      }
+                                      var temp = _routeStore.locs.length;
+                                      for (int i = index + 1; i < temp; i++) {
+                                        List<String> _locName = _routeStore.locs[i];
+                                        Location _locLocation = _routeStore.coords[i];
+                                        _routeStore.locs[i - 1] = _locName;
+                                        _routeStore.coords[i - 1] = _locLocation;
+                                      }
+                                      print(_routeStore.locs.length);
+                                      _routeStore.locs.removeAt(_routeStore.locs.length - 1);
+                                      print(_routeStore.coords.length);
+                                      _routeStore.coords.removeAt(_routeStore.coords.length - 1);
+                                      _routeStore.startName = ObservableList.of(_locName);
+                                      _routeStore.startLoc = _locLocation;
+                                    },
+                                    child: Text('Set as Start Location'),
                                   ),
-                                  Padding(
-                                    padding: EdgeInsets.only(
-                                        left: size.width * 0.02,
-                                        top: size.height * 0.01),
-                                    child: Container(
-                                      width: size.width * 0.665,
-                                      child: Column(
-                                        children: [
-                                          Container(
-                                            width: size.width * 0.8,
-                                            height: size.height * 0.03,
-                                            child: Observer(
-                                              builder: (_) {
-                                                return Text(
-                                                  _routeStore.locs[index][0],
-                                                  style: TextStyle(
-                                                      fontSize: 15.0,
-                                                      fontWeight:
-                                                          FontWeight.w500),
-                                                );
-                                              },
+                                ),
+                              ),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.only(),
+                              child: Container(
+                                height: size.height * 0.05,
+                                width: size.width * 0.9,
+                                child: Align(
+                                  alignment: Alignment.center,
+                                  child: ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      primary: Colors.red,
+                                    ),
+                                    onPressed: () {
+                                      for (int i = index + 1; i < _routeStore.locs.length; i++) {
+                                        List<String> _locName = _routeStore.locs[i];
+                                        Location _locLocation = _routeStore.coords[i];
+                                        _routeStore.locs[i - 1] = _locName;
+                                        _routeStore.coords[i - 1] = _locLocation;
+                                      }
+                                      _routeStore.locs.removeAt(_routeStore.locs.length - 1);
+                                      _routeStore.coords.removeAt(_routeStore.coords.length - 1);
+                                    },
+                                    child: Text('Delete Location'),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                          title: Column(
+                            children: [
+                              SizedBox(
+                                height: index == 0 ? size.height * 0.006 : 0,
+                              ),
+                              Container(
+                                height: size.height * 0.08,
+                                child: Row(
+                                  children: [
+                                    Container(
+                                      width: size.width * 0.1,
+                                      child: Padding(
+                                        padding: EdgeInsets.only(bottom: size.height * 0.015),
+                                        child: Icon(Icons.location_pin),
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: EdgeInsets.only(left: size.width * 0.02, top: size.height * 0.01),
+                                      child: Container(
+                                        width: size.width * 0.665,
+                                        child: Column(
+                                          children: [
+                                            Container(
+                                              width: size.width * 0.8,
+                                              height: size.height * 0.03,
+                                              child: Observer(
+                                                builder: (_) {
+                                                  return Text(
+                                                    _routeStore.locs[index][0],
+                                                    style: TextStyle(fontSize: 15.0, fontWeight: FontWeight.w500),
+                                                  );
+                                                },
+                                              ),
                                             ),
-                                          ),
-                                          Container(
-                                            width: size.width * 0.8,
-                                            height: size.height * 0.03,
-                                            child: Observer(
-                                              builder: (_) => Text(
-                                                _routeStore.locs[index][1],
-                                                overflow: TextOverflow.ellipsis,
-                                                style: TextStyle(
-                                                  fontSize: 12.0,
+                                            Container(
+                                              width: size.width * 0.8,
+                                              height: size.height * 0.03,
+                                              child: Observer(
+                                                builder: (_) => Text(
+                                                  _routeStore.locs[index][1],
+                                                  overflow: TextOverflow.ellipsis,
+                                                  style: TextStyle(
+                                                    fontSize: 12.0,
+                                                  ),
                                                 ),
                                               ),
                                             ),
-                                          ),
-                                        ],
+                                          ],
+                                        ),
                                       ),
-                                    ),
-                                  )
-                                ],
+                                    )
+                                  ],
+                                ),
                               ),
-                            ),
-                            Divider(
-                              height: size.height * 0.005,
-                            ),
-                          ],
+                              Divider(
+                                height: size.height * 0.005,
+                              ),
+                            ],
+                          ),
                         ),
                       ),
-                    ),
-                  );
-                },
+                    );
+                  },
+                ),
               ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
   Widget _searchBar(Size size) {
     return Padding(
-      padding: EdgeInsets.only(top: size.height * 0.02),
+      padding: EdgeInsets.only(top: size.height * 0.04),
       child: Align(
         alignment: Alignment.topCenter,
         child: GestureDetector(
@@ -468,7 +430,7 @@ class _RouteScreenState extends State<RouteScreen> {
             ));
           },
           child: Container(
-            height: size.height * 0.12,
+            height: size.height * 0.09,
             width: size.width,
             child: AbsorbPointer(
               child: FloatingSearchBar(
@@ -478,7 +440,7 @@ class _RouteScreenState extends State<RouteScreen> {
                 transitionCurve: Curves.easeInOut,
                 transition: ExpandingFloatingSearchBarTransition(),
                 physics: const BouncingScrollPhysics(),
-                height: size.height * 0.12,
+                height: size.height * 0.09,
                 width: size.width * 0.85,
                 debounceDelay: const Duration(milliseconds: 500),
                 onQueryChanged: (query) {},
