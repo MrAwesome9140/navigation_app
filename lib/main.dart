@@ -5,6 +5,7 @@ import 'package:navigation_app/UI/Views/Central_Screen.dart';
 import 'package:navigation_app/UI/Views/Home_Screen.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:system_alert_window/system_alert_window.dart';
 
 import 'Services/auth_service.dart';
 import 'UI/Views/Login_Screen.dart';
@@ -12,7 +13,12 @@ import 'UI/Views/Login_Screen.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  await SystemAlertWindow.registerOnClickListener(_closeWindow);
   runApp(MyApp());
+}
+
+void _closeWindow(String tag) {
+  SystemAlertWindow.closeSystemWindow();
 }
 
 class MyApp extends StatelessWidget {

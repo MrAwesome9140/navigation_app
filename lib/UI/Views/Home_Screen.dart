@@ -46,7 +46,7 @@ class _HomeScreenState extends State<HomeScreen> {
       allowsUTurnAtWayPoints: true,
       mode: MapBoxNavigationMode.drivingWithTraffic,
       units: VoiceUnits.imperial,
-      simulateRoute: false,
+      simulateRoute: true,
       animateBuildRoute: true,
       longPressDestinationEnabled: false,
       language: "en",
@@ -59,11 +59,14 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
+    var _height = MediaQuery.of(context).size.height -
+    (MediaQuery.of(context).padding.bottom +
+        MediaQuery.of(context).padding.top);
     return Scaffold(
       body: Stack(
         children: [
           Container(
-            height: size.height * 0.93,
+            height: _height * 0.94,
             child: Map(),
           ),
         ],

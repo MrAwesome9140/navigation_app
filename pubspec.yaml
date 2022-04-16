@@ -49,6 +49,8 @@ dependencies:
   provider: ^6.0.0
   email_validator: ^2.0.1
   settings_ui: ^2.0.2
+  maps_launcher: ^2.0.1
+  system_alert_window: ^1.1.1
 
 dev_dependencies:
   flutter_test:

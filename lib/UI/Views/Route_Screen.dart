@@ -5,10 +5,12 @@ import 'package:flutter/services.dart';
 import 'package:flutter_mapbox_navigation/library.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:geocoding/geocoding.dart';
+import 'package:maps_launcher/maps_launcher.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 import 'package:mobx/mobx.dart';
 import 'package:navigation_app/Models/graph.dart';
 import 'package:navigation_app/Services/mapbox_service.dart';
+import 'package:navigation_app/Services/navigation_service.dart';
 import 'package:navigation_app/UI/Views/Navigation_Screen.dart';
 import 'package:navigation_app/UI/Views/Search_Screen.dart';
 import 'package:navigation_app/State/route_store.dart';
@@ -203,39 +205,40 @@ class _RouteScreenState extends State<RouteScreen> {
         child: ElevatedButton(
           style: ButtonStyle(backgroundColor: MaterialStateProperty.all(Colors.green[200])),
           onPressed: () async {
-            if (_switch1State) {
-              _routeStore.curStep = 0;
-              Future<void> dialog = showGeneralDialog(
-                context: context,
-                barrierColor: Colors.black26.withOpacity(0.4),
-                barrierDismissible: false,
-                barrierLabel: 'Progress',
-                transitionDuration: Duration(milliseconds: 500),
-                pageBuilder: (c, __, ___) {
-                  return OverlayView(highCont: context);
-                },
-              );
-              List<Location> _fullCoords = [_routeStore.startLoc];
-              _fullCoords.addAll(_routeStore.coords);
-              List<SpecialVertex> _optiRoute = await _mapBoxService.getOptimalPath(_fullCoords);
-              List<Location> _optimal = [];
-              List<List<String>> _optiNames = [];
-              for (int i = 1; i < _optiRoute.length; i++) {
-                _optimal.add(_routeStore.coords[_optiRoute[i].label - 1]);
-                _optiNames.add(_routeStore.locs[_optiRoute[i].label - 1]);
-              }
-              _routeStore.locs = ObservableList.of(_optiNames);
-              _routeStore.coords = ObservableList.of(_optimal);
-            }
-            List<WayPoint> route = [];
-            route.add(new WayPoint(name: _routeStore.startName[0], latitude: _routeStore.startLoc.latitude, longitude: _routeStore.startLoc.longitude));
-            for (int i = 0; i < _routeStore.locs.length; i++) {
-              route.add(new WayPoint(name: _routeStore.locs[i][0], latitude: _routeStore.coords[i].latitude, longitude: _routeStore.coords[i].longitude));
-            }
-            if (_switch2State) {
-              route.add(new WayPoint(name: _routeStore.startName[0], latitude: _routeStore.startLoc.latitude, longitude: _routeStore.startLoc.longitude));
-            }
-            await _directions.startNavigation(wayPoints: route, options: _options);
+            // if (_switch1State) {
+            //   _routeStore.curStep = 0;
+            //   Future<void> dialog = showGeneralDialog(
+            //     context: context,
+            //     barrierColor: Colors.black26.withOpacity(0.4),
+            //     barrierDismissible: false,
+            //     barrierLabel: 'Progress',
+            //     transitionDuration: Duration(milliseconds: 500),
+            //     pageBuilder: (c, __, ___) {
+            //       return OverlayView(highCont: context);
+            //     },
+            //   );
+            //   List<Location> _fullCoords = [_routeStore.startLoc];
+            //   _fullCoords.addAll(_routeStore.coords);
+            //   List<SpecialVertex> _optiRoute = await _mapBoxService.getOptimalPath(_fullCoords);
+            //   List<Location> _optimal = [];
+            //   List<List<String>> _optiNames = [];
+            //   for (int i = 1; i < _optiRoute.length; i++) {
+            //     _optimal.add(_routeStore.coords[_optiRoute[i].label - 1]);
+            //     _optiNames.add(_routeStore.locs[_optiRoute[i].label - 1]);
+            //   }
+            //   _routeStore.locs = ObservableList.of(_optiNames);
+            //   _routeStore.coords = ObservableList.of(_optimal);
+            // }
+            // List<WayPoint> route = [];
+            // route.add(new WayPoint(name: _routeStore.startName[0], latitude: _routeStore.startLoc.latitude, longitude: _routeStore.startLoc.longitude));
+            // for (int i = 0; i < _routeStore.locs.length; i++) {
+            //   route.add(new WayPoint(name: _routeStore.locs[i][0], latitude: _routeStore.coords[i].latitude, longitude: _routeStore.coords[i].longitude));
+            // }
+            // if (_switch2State) {
+            //   route.add(new WayPoint(name: _routeStore.startName[0], latitude: _routeStore.startLoc.latitude, longitude: _routeStore.startLoc.longitude));
+            // }
+            await NavigationService().startNavigation();
+            //await _directions.startNavigation(wayPoints: route, options: _options);
           },
           child: Text(
             'Start Route',
